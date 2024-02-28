@@ -5,12 +5,14 @@ import { PrismaClient } from '@prisma/client';
 @Injectable()
 export class AllergensService {
   constructor(private readonly db : PrismaClient) {}
-  
+
   findAll() {
-    return `This action returns all allergens`;
+    return this.db.allergens.findMany();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} allergen`;
+    return this.db.allergens.findUnique({
+      where : {id}
+    });
   }
 }
