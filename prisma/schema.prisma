@@ -9,3 +9,58 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
+model Users {
+  id       Int       @id @default(autoincrement())
+  email    String    @unique @db.VarChar(30)
+  name     String    @db.VarChar(20)
+  password String
+  role     String    @default("user") @db.VarChar(15)
+  token    Token[]
+  recipes  Recipes[]
+  rating   Ratings[]
+}
+
+model Recipes {
+  id          Int                @id @default(autoincrement())
+  title       String             @db.VarChar(100)
+  description String             @db.VarChar(300)
+  content     String             @db.LongText
+  pretime     Int                @db.TinyInt
+  posted      DateTime           @default(now()) @db.Timestamp()
+  user        Users              @relation(fields: [user_id], references: [id])
+  user_id     Int
+  rating      Ratings[]
+  connect     Recipe_Allergens[]
+}
+
+model Ratings {
+  id        Int      @id @default(autoincrement())
+  user      Users    @relation(fields: [user_id], references: [id])
+  user_id   Int
+  recipe    Recipes  @relation(fields: [recipe_id], references: [id])
+  recipe_id Int
+  rating    Int
+  content   String   @db.LongText
+  posted    DateTime @default(now()) @db.Timestamp()
+}
+
+model Allergens {
+  id      Int                @id @default(autoincrement())
+  name    String             @db.VarChar(20)
+  connect Recipe_Allergens[]
+}
+
+model Recipe_Allergens {
+  id          Int       @id @default(autoincrement())
+  allergen    Allergens @relation(fields: [allergen_id], references: [id])
+  allergen_id Int
+  recipe      Recipes   @relation(fields: [recipe_id], references: [id])
+  recipe_id   Int
+}
+
+model Token {
+  id      String @id
+  user    Users  @relation(fields: [user_id], references: [id])
+  user_id Int
+}
