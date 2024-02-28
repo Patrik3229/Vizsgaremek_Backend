@@ -1,1 +1,21 @@
-export class CreateRatingDto {}
+import { IsDateString, IsNotEmpty, IsNumber, IsString } from "class-validator"
+
+export class CreateRatingDto {
+  @IsNumber()
+  @IsNotEmpty()
+  user_id: number
+
+  @IsNumber()
+  @IsNotEmpty()
+  recipe_id: number
+
+  @IsNumber()
+  @IsNotEmpty()
+  rating: number
+
+  @IsString()
+  content: string
+
+  @IsDateString()
+  posted: string
+}
