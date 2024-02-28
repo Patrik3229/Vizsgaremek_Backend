@@ -28,7 +28,7 @@ model Recipes {
   content     String             @db.LongText
   preptime    Int                @db.TinyInt
   posted      DateTime           @default(now()) @db.Timestamp()
-  user        Users              @relation(fields: [user_id], references: [id])
+  user        Users              @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   user_id     Int
   rating      Ratings[]
   connect     Recipe_Allergens[]
@@ -36,9 +36,9 @@ model Recipes {
 
 model Ratings {
   id        Int      @id @default(autoincrement())
-  user      Users    @relation(fields: [user_id], references: [id])
+  user      Users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   user_id   Int
-  recipe    Recipes  @relation(fields: [recipe_id], references: [id])
+  recipe    Recipes  @relation(fields: [recipe_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   recipe_id Int
   rating    Int
   content   String   @db.LongText
@@ -53,14 +53,14 @@ model Allergens {
 
 model Recipe_Allergens {
   id          Int       @id @default(autoincrement())
-  allergen    Allergens @relation(fields: [allergen_id], references: [id])
+  allergen    Allergens @relation(fields: [allergen_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   allergen_id Int
-  recipe      Recipes   @relation(fields: [recipe_id], references: [id])
+  recipe      Recipes   @relation(fields: [recipe_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   recipe_id   Int
 }
 
 model Token {
   id      String @id
-  user    Users  @relation(fields: [user_id], references: [id])
+  user    Users  @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   user_id Int
 }
