@@ -3,33 +3,66 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma.service';
 
+
 @Injectable()
 export class UsersService {
-  constructor(private readonly db: PrismaService) {}
+  constructor(private readonly db: PrismaService) { }
 
   findByEmail(email: string) {
     return this.db.users.findUnique({
       where: { email }
     })
   }
-  
+
   create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+    return this.db.users.create({
+      data: {
+        email: createUserDto.email,
+        name: createUserDto.name,
+        password: createUserDto.password
+      }
+    })
   }
 
   findAll() {
-    return `This action returns all users`;
+    return this.db.users.findMany();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} user`;
+    return this.db.users.findUniqueOrThrow({
+      where: { id }
+    })
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+    return this.db.users.update({
+      where: { id },
+      data: {
+        email: updateUserDto.email,
+        name: updateUserDto.name,
+        password: updateUserDto.password,
+      }
+    })
+  }
+
+  updateRole(id: number, updateUserDto: UpdateUserDto) {
+    return this.db.users.update({
+      where: { id },
+      data: {
+        role: updateUserDto.role
+      }
+    })
   }
 
   remove(id: number) {
-    return `This action removes a #${id} user`;
+    return this.db.users.delete({
+      where: { id }
+    })
+  }
+
+  removeManager(id: number) {
+    return this.db.users.delete({
+      where: { id }
+    })
   }
 }
