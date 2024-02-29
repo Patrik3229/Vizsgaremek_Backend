@@ -9,15 +9,25 @@ import { Users } from '@prisma/client';
 export class RecipesController {
   constructor(private readonly recipesService: RecipesService) {}
 
+  /**
+   * új receptet fügvény
+   * @param createRecipeDto 
+   * @returns az adatbázisba új recept tesz bele
+   */
   @Post()
   create(@Body() createRecipeDto: CreateRecipeDto) {
     return this.recipesService.create(createRecipeDto);
   }
 
+  /**
+   * az összes receptet ki listázza
+   * @returns egy listát a receptekből
+   */
   @Get()
   findAll() {
     return this.recipesService.findAll();
   }
+
 
   @Get()
   topFive() {

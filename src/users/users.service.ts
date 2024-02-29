@@ -9,18 +9,34 @@ import * as argon2 from "argon2";
 export class UsersService {
   constructor(private readonly db: PrismaService) { }
 
+  /**
+   * email szerint kereső
+   * @param email 
+   * @returns user adatait
+   */
   findByEmail(email: string) {
     return this.db.users.findUnique({
       where: { email }
     })
   }
-  
-  //password hashing
+
+  /**
+   * jelszó titkosítás
+   * @param password 
+   * @returns hash jelszót
+   */
   async passwordHash(password : string) {
+    /**megadott password hash-eli */
     const secret = await argon2.hash(password)
     return secret
   }
   
+  /**
+   * új User add hozzá
+   * @param createUserDto 
+   * @param secret 
+   * @returns új felhasználót
+   */
   create(createUserDto: CreateUserDto, secret : string) {
     return this.db.users.create({
       data : {
@@ -33,16 +49,32 @@ export class UsersService {
     })
   }
 
+  /**
+   * user listázó
+   * @returns minden létező user-t
+   */
   findAll() {
     return this.db.users.findMany();
   }
 
+  /**
+   * user keresés
+   * @param id 
+   * @returns 1 user
+   */
   findOne(id: number) {
-    return this.db.users.findUniqueOrThrow({
-      where: { id }
-    })
+
+    /**id szerint van a search */
+    return `This action returns a #${id} user`;
+
   }
 
+  /**
+   * user frissítés
+   * @param id 
+   * @param updateUserDto 
+   * @returns a módosított adatok
+   */
   update(id: number, updateUserDto: UpdateUserDto) {
     return this.db.users.update({
       where: { id },
@@ -63,7 +95,14 @@ export class UsersService {
     })
   }
 
+  /**
+   * user törlést
+   * @param id 
+   * @returns törlést
+   */
   remove(id: number) {
+
+    /**id szerint törlünk */
     return this.db.users.delete({
       where: { id }
     })
@@ -73,5 +112,6 @@ export class UsersService {
     return this.db.users.delete({
       where: { id }
     })
+
   }
 }
