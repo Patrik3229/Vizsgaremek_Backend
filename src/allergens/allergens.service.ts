@@ -1,11 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { CreateAllergenDto } from './dto/create-allergen.dto';
-import { PrismaClient } from '@prisma/client';
+import { PrismaService } from 'src/prisma.service';
 
 
 @Injectable()
 export class AllergensService {
-  constructor(private readonly db : PrismaClient) {}
+  constructor(private readonly db : PrismaService) {}
 
   findAll() {
     return this.db.allergens.findMany();
