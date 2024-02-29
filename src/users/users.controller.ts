@@ -4,6 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Users } from '@prisma/client';
 import { AuthGuard } from '@nestjs/passport';
+import { AuthService } from 'src/auth/auth.service';
 
 @Controller('users')
 export class UsersController {
@@ -20,7 +21,7 @@ export class UsersController {
     }
   }
 
-  @Post()
+  @Post('register')
   async register(@Body() createUserDto: CreateUserDto) {
     if(createUserDto.password != createUserDto.passwordAgain){
       throw new UnauthorizedException('A jelszavak nem egyeznek')

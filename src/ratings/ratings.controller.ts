@@ -12,10 +12,10 @@ export class RatingsController {
     return this.ratingsService.create(createRatingDto);
   }
 
-  @Get()
-  findAll() {
-    return this.ratingsService.findAll();
-  }
+  // @Get()
+  // findAll() {
+  //   return this.ratingsService.findAll();
+  // }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
