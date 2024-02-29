@@ -4,9 +4,10 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma.service';
 import * as argon2 from "argon2";
 
+
 @Injectable()
 export class UsersService {
-  constructor(private readonly db: PrismaService) {}
+  constructor(private readonly db: PrismaService) { }
 
   /**
    * email szerint kereső
@@ -43,6 +44,7 @@ export class UsersService {
         name : createUserDto.name,
         password : secret,
         role : 'user'
+
       }
     })
   }
@@ -52,7 +54,7 @@ export class UsersService {
    * @returns minden létező user-t
    */
   findAll() {
-    return `This action returns all users`;
+    return this.db.users.findMany();
   }
 
   /**
@@ -61,8 +63,10 @@ export class UsersService {
    * @returns 1 user
    */
   findOne(id: number) {
+
     /**id szerint van a search */
     return `This action returns a #${id} user`;
+
   }
 
   /**
@@ -72,7 +76,23 @@ export class UsersService {
    * @returns a módosított adatok
    */
   update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+    return this.db.users.update({
+      where: { id },
+      data: {
+        email: updateUserDto.email,
+        name: updateUserDto.name,
+        password: updateUserDto.password,
+      }
+    })
+  }
+
+  updateRole(id: number, updateUserDto: UpdateUserDto) {
+    return this.db.users.update({
+      where: { id },
+      data: {
+        role: updateUserDto.role
+      }
+    })
   }
 
   /**
@@ -81,7 +101,17 @@ export class UsersService {
    * @returns törlést
    */
   remove(id: number) {
+
     /**id szerint törlünk */
-    return `This action removes a #${id} user`;
+    return this.db.users.delete({
+      where: { id }
+    })
+  }
+
+  removeManager(id: number) {
+    return this.db.users.delete({
+      where: { id }
+    })
+
   }
 }

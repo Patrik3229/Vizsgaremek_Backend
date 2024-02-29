@@ -9,7 +9,7 @@ const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   /**
    * A bejelenkezett user adatait adja vissza
@@ -21,7 +21,7 @@ export class UsersController {
   /**Kötelező a token megadni */
   @UseGuards(AuthGuard('bearer'))
   me(@Request() req) {
-    const user: Users = req.users;
+    const user: Users = req.user;
     return {
       email: user.email,
       name: user.name,
@@ -90,18 +90,42 @@ export class UsersController {
    * @returns adatbázisban megváltoztatja az adatokat
    */
   @Patch(':id')
+  @UseGuards(AuthGuard('bearer'))
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     //TODO new password hash
     return this.usersService.update(+id, updateUserDto);
   }
+
 
   /**
    * egy user adatait tudja kitörölni
    * @param id user id
    * @returns kitöli az adatokat -> egyből ki jelenkezteti
    */
+  @Patch(':id')
+  @UseGuards(AuthGuard('bearer'))
+  updateRole(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @Request() req) {
+    const user: Users = req.user;
+    if (user.role != 'manager') {
+      throw new ForbiddenException();
+    }
+
+    return this.usersService.update(+id, updateUserDto);
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
+  }
+
+  @Delete(':id')
+  removeManager(@Param('id') id: string, @Request() req) {
+
+    const user: Users = req.user;
+    if (user.role != 'manager') {
+      throw new ForbiddenException();
+    }
+
+    return this.usersService.removeManager(+id);
   }
 }
