@@ -1,36 +1,34 @@
 import { Injectable } from '@nestjs/common';
 import { Users } from '@prisma/client';
-import { randomBytes } from 'crypto';
 import { PrismaService } from 'src/prisma.service';
-
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  constructor (private readonly db: PrismaService) {}
+  constructor (private readonly db: PrismaService, private readonly jwt : JwtService) {}
 
   async generateTokenFor(user: Users) {
-    const randomBuffer = randomBytes(32);
-    const randomString = randomBuffer.toString('hex');
-
-    await this.db.token.create({
-      data: {
-        token: randomString,
-        user_id: user.id,
-      }
-    })
-
-    return randomString;
+    /** */
+    const payload = {sub : user.id, username : user.email}
+    return await this.jwt.signAsync(payload, {
+      secret : process.env.TOKEN_SECRET,
+      expiresIn : "2h"
+    });
   }
 
-  async findUserByToken(token: string) {
-    const tokenObj = await this.db.token.findUnique({
-      where: { token }
-    })
-    if (tokenObj == null) {
-      return null;
+  async validateToken(token: string) {
+    if(!token){
+      return null
     }
-    return await this.db.users.findUniqueOrThrow({
-      where: { id: tokenObj.user_id }
-    })
+    try{
+      const payload = await this.jwt.verifyAsync(token, {
+        secret : process.env.TOKEN_SECRET
+      })
+      return await this.db.users.findUniqueOrThrow({
+           where: { id: payload.sub }
+         })
+    } catch {
+      return null
+    }
   }
 }
