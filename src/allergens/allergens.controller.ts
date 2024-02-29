@@ -6,11 +6,6 @@ import { CreateAllergenDto } from './dto/create-allergen.dto';
 export class AllergensController {
   constructor(private readonly allergensService: AllergensService) {}
 
-  @Post()
-  create(@Body() createAllergenDto: CreateAllergenDto) {
-    return this.allergensService.create(createAllergenDto);
-  }
-
   @Get()
   findAll() {
     return this.allergensService.findAll();
@@ -19,10 +14,5 @@ export class AllergensController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.allergensService.findOne(+id);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.allergensService.remove(+id);
   }
 }

@@ -1,21 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAllergenDto } from './dto/create-allergen.dto';
+import { PrismaClient } from '@prisma/client';
+
 
 @Injectable()
 export class AllergensService {
-  create(createAllergenDto: CreateAllergenDto) {
-    return 'This action adds a new allergen';
-  }
+  constructor(private readonly db : PrismaClient) {}
 
   findAll() {
-    return `This action returns all allergens`;
+    return this.db.allergens.findMany();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} allergen`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} allergen`;
+    return this.db.allergens.findUnique({
+      where : {id}
+    });
   }
 }
