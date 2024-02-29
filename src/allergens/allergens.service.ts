@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateAllergenDto } from './dto/create-allergen.dto';
 import { PrismaClient } from '@prisma/client';
 
+
 @Injectable()
 export class AllergensService {
   constructor(private readonly db : PrismaClient) {}
