@@ -8,12 +8,12 @@ import { AuthService } from 'src/auth/auth.service';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @Get('me')
   @UseGuards(AuthGuard('bearer'))
   me(@Request() req) {
-    const user: Users = req.users;
+    const user: Users = req.user;
     return {
       email: user.email,
       name: user.name,
@@ -34,10 +34,9 @@ export class UsersController {
   @UseGuards(AuthGuard('bearer'))
   findAll(@Request() req) {
     const user: Users = req.user;
-    if (user.role != 'admin') {
+    if (user.role != 'admin' && user.role != 'manager') {
       throw new ForbiddenException();
     }
-    // Ezt a függvényt csak admin jogosultságú user tudja meghívni
     return this.usersService.findAll();
   }
 
@@ -47,12 +46,35 @@ export class UsersController {
   }
 
   @Patch(':id')
+  @UseGuards(AuthGuard('bearer'))
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.update(+id, updateUserDto);
+  }
+
+  @Patch(':id')
+  @UseGuards(AuthGuard('bearer'))
+  updateRole(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @Request() req) {
+    const user: Users = req.user;
+    if (user.role != 'manager') {
+      throw new ForbiddenException();
+    }
+
     return this.usersService.update(+id, updateUserDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
+  }
+
+  @Delete(':id')
+  removeManager(@Param('id') id: string, @Request() req) {
+
+    const user: Users = req.user;
+    if (user.role != 'manager') {
+      throw new ForbiddenException();
+    }
+
+    return this.usersService.removeManager(+id);
   }
 }
