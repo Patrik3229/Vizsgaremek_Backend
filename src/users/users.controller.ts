@@ -4,7 +4,6 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Users } from '@prisma/client';
 import { AuthGuard } from '@nestjs/passport';
-import { verify } from 'argon2';
 
 @Controller('users')
 export class UsersController {
@@ -22,11 +21,11 @@ export class UsersController {
   }
 
   @Post()
-  register(@Body() createUserDto: CreateUserDto) {
+  async register(@Body() createUserDto: CreateUserDto) {
     if(createUserDto.password != createUserDto.passwordAgain){
       throw new UnauthorizedException('A jelszavak nem egyeznek')
     }
-    const secret = this.usersService.secretPassword(createUserDto.password)
+    const secret = await this.usersService.passwordHash(createUserDto.password)
     return this.usersService.create(createUserDto, secret)
   }
 

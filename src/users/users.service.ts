@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma.service';
-import { verify } from 'argon2';
+import * as argon2 from "argon2";
 
 @Injectable()
 export class UsersService {
@@ -14,8 +14,10 @@ export class UsersService {
     })
   }
 
-  secretPassword(password : string) {
-    return 'hashed password'  
+  //password hashing
+  async passwordHash(password : string) {
+    const secret = await argon2.hash(password)
+    return secret
   }
   
   create(createUserDto: CreateUserDto, secret : string) {
