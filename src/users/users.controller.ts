@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Request, UseGuards, ForbiddenException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Request, UseGuards, ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Users } from '@prisma/client';
 import { AuthGuard } from '@nestjs/passport';
+import { verify } from 'argon2';
 
 @Controller('users')
 export class UsersController {
@@ -21,8 +22,12 @@ export class UsersController {
   }
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  register(@Body() createUserDto: CreateUserDto) {
+    if(createUserDto.password != createUserDto.passwordAgain){
+      throw new UnauthorizedException('A jelszavak nem egyeznek')
+    }
+    const secret = this.usersService.secretPassword(createUserDto.password)
+    return this.usersService.create(createUserDto, secret)
   }
 
   @Get('all')
