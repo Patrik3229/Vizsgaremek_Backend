@@ -5,12 +5,12 @@ import { AllergensService } from './allergens.service';
 export class AllergensController {
   constructor(private readonly allergensService: AllergensService) {}
 
-  @Get()
+  @Get('all')
   findAll() {
     return this.allergensService.findAll();
   }
 
-  @Get(':id')
+  @Get('find:id')
   findOne(@Param('id') id: string) {
     return this.allergensService.findOne(+id);
   }

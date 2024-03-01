@@ -76,7 +76,7 @@ export class UsersController {
    * @param id 
    * @returns user adatokat
    */
-  @Get(':id')
+  @Get('find:id')
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(+id);
   }
@@ -89,7 +89,7 @@ export class UsersController {
    * @param updateUserDto megváltoztatni való adatok
    * @returns adatbázisban megváltoztatja az adatokat
    */
-  @Patch(':id')
+  @Patch('update')
   @UseGuards(AuthGuard('bearer'))
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     //TODO new password hash
@@ -102,7 +102,7 @@ export class UsersController {
    * @param id user id
    * @returns kitöli az adatokat -> egyből ki jelenkezteti
    */
-  @Patch(':id')
+  @Patch('update:admin')
   @UseGuards(AuthGuard('bearer'))
   updateRole(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @Request() req) {
     const user: Users = req.user;
@@ -113,12 +113,12 @@ export class UsersController {
     return this.usersService.update(+id, updateUserDto);
   }
 
-  @Delete(':id')
+  @Delete('delete')
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
   }
 
-  @Delete(':id')
+  @Delete('update:admin')
   removeManager(@Param('id') id: string, @Request() req) {
 
     const user: Users = req.user;

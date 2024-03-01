@@ -14,7 +14,7 @@ export class RecipesController {
    * @param createRecipeDto 
    * @returns az adatbázisba új recept tesz bele
    */
-  @Post()
+  @Post('post')
   create(@Body() createRecipeDto: CreateRecipeDto) {
     return this.recipesService.create(createRecipeDto);
   }
@@ -23,30 +23,30 @@ export class RecipesController {
    * az összes receptet ki listázza
    * @returns egy listát a receptekből
    */
-  @Get()
+  @Get('all')
   findAll() {
     return this.recipesService.findAll();
   }
 
 
-  @Get()
+  @Get('top5')
   topFive() {
     return this.recipesService.topfive();
   }
 
 
-  @Get(':id')
+  @Get('find:id')
   findOne(@Param('id') id: string) {
     return this.recipesService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Patch('update:id')
   @UseGuards(AuthGuard('bearer'))
   update(@Param('id') id: string, @Body() updateRecipeDto: UpdateRecipeDto) {
     return this.recipesService.update(+id, updateRecipeDto);
   }
 
-  @Patch(':id')
+  @Patch('update:admin')
   @UseGuards(AuthGuard('bearer'))
   updateManager(@Param('id') id: string, @Body() updateRecipeDto: UpdateRecipeDto, @Request() req) {
     const user : Users = req.user
@@ -56,13 +56,13 @@ export class RecipesController {
     return this.recipesService.update(+id, updateRecipeDto);
   }
 
-  @Delete(':id')
+  @Delete('delete:id')
   @UseGuards(AuthGuard('bearer'))
   remove(@Param('id') id: string) {
     return this.recipesService.remove(+id);
   }
 
-  @Delete(':id')
+  @Delete('delete:admin')
   @UseGuards(AuthGuard('bearer'))
   removeManager(@Param('id') id: string, @Request() req) {
     const user : Users = req.user
