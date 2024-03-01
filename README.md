@@ -1,5 +1,5 @@
 <h1>Vizsgaremek Backend</h1>
-<hr><br>
+<hr>
 <h6>Csapat tagok</h6>
 <ul>
     <li>Kovács Patrik</li>
