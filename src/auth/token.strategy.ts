@@ -10,6 +10,11 @@ export class TokenStrategy extends PassportStrategy(Strategy) {
     super();
   }
 
+  /**
+   * token validátor
+   * @param token 
+   * @returns user vagy null
+   */
   async validate(token: string) {
     const user = await this.authService.validateToken(token);
     if (user == null) {

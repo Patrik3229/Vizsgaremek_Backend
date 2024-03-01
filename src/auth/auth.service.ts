@@ -7,8 +7,13 @@ import { JwtService } from '@nestjs/jwt';
 export class AuthService {
   constructor (private readonly db: PrismaService, private readonly jwt : JwtService) {}
 
+  /**
+   * jwt token generáltor
+   * @param user 
+   * @returns jwt token
+   */
   async generateTokenFor(user: Users) {
-    /** */
+    /**ezeket az adatokat tesszük bele a token-be */
     const payload = {sub : user.id, username : user.email}
     return await this.jwt.signAsync(payload, {
       secret : process.env.TOKEN_SECRET,
@@ -16,6 +21,11 @@ export class AuthService {
     });
   }
 
+  /**
+   * token elelenörző
+   * @param token 
+   * @returns ha helyes akkor usert különben null
+   */
   async validateToken(token: string) {
     if(!token){
       return null
