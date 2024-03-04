@@ -21,6 +21,18 @@ export class UsersService {
   }
 
   /**
+   * nev szerint kikeres
+   * @param name 
+   * @returns user adatokat
+   */
+  findByName(name : string) {
+    /**findmany mivel a nevek egyezhetnek */
+    return this.db.users.findMany({
+      where : {name}
+    })
+  }
+
+  /**
    * jelszó titkosítás
    * @param password 
    * @returns hash jelszót

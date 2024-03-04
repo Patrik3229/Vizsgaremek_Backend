@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
 import { PrismaService } from 'src/prisma.service';
+import { take } from 'rxjs';
 
 @Injectable()
 export class RecipesService {
@@ -33,9 +34,7 @@ export class RecipesService {
   }
 
   topfive(){
-    return this.db.recipes.findMany(
-      //limit and orderby
-    )
+    return 
   }
 
   update(id: number, updateRecipeDto: UpdateRecipeDto) {

@@ -46,4 +46,19 @@ export class RatingsService {
       where : {id}
     });
   }
+
+  avgRating(id : number){
+    return this.db.ratings.aggregate({
+      _avg : {
+        rating : true
+      },
+      where : {id}
+    })
+  }
+
+  topFiveRating(){
+    return this.db.ratings.groupBy({
+      by : 'recipe_id',
+    })
+  }
 }
