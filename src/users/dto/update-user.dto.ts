@@ -1,6 +1,7 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateUserDto } from './create-user.dto';
 import { IsNotEmpty, IsNumber } from 'class-validator';
+import { Optional } from '@nestjs/common';
 
 /**
  * update, delete kellendők extra adatok
@@ -10,4 +11,22 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsNumber()
   @IsNotEmpty()
   id: number
+
+  @Optional()
+  passwordOld: string
+
+  @Optional()
+  name?: string;
+
+  @Optional()
+  email?: string;
+
+  @Optional()
+  password?: string;
+
+  @Optional()
+  passwordAgain?: string;
+
+  @Optional()
+  role?: string;
 }

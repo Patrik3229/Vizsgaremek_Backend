@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 
 
@@ -14,5 +15,18 @@ export class AllergensService {
     return this.db.allergens.findUnique({
       where : {id}
     });
+  }
+
+  findbyName(name: string) {
+    return this.db.allergens.findMany({
+      where : {
+        name : {
+          contains : name
+        }
+      },
+      select : {
+        id : true
+      }
+    })
   }
 }

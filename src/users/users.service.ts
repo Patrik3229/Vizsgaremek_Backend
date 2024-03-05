@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma.service';
@@ -17,6 +17,28 @@ export class UsersService {
   findByEmail(email: string) {
     return this.db.users.findUnique({
       where: { email }
+    })
+  }
+
+  /**
+   * nev szerint kikeres
+   * @param name 
+   * @returns user adatokat
+   */
+  findByName(name : string) {
+    /**findmany mivel a nevek egyezhetnek */
+    return this.db.users.findMany({
+      where : {
+        name : {
+          contains : name
+        }
+      },
+      select : {
+        id : true,
+        email : true,
+        name : true,
+        role : true
+      }
     })
   }
 
@@ -54,7 +76,11 @@ export class UsersService {
    * @returns minden létező user-t
    */
   findAll() {
-    return this.db.users.findMany();
+    return this.db.users.findMany({
+      select : {
+        password : false
+      }
+    });
   }
 
   /**
@@ -76,6 +102,13 @@ export class UsersService {
    * @returns a módosított adatok
    */
   update(id: number, updateUserDto: UpdateUserDto) {
+    if(updateUserDto.password != updateUserDto.passwordAgain){
+      throw new BadRequestException('A jelszavak nem egyeznek!')
+    }
+    if((updateUserDto.password != updateUserDto.passwordOld) && (updateUserDto.passwordAgain != updateUserDto.passwordOld)){
+      throw new BadRequestException('A jelsó megegyezik a régivel')
+    }
+    //regex
     return this.db.users.update({
       where: { id },
       data: {

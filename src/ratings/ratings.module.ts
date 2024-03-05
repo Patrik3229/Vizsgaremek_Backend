@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { RatingsService } from './ratings.service';
 import { RatingsController } from './ratings.controller';
 import { PrismaService } from 'src/prisma.service';
+import { AllergensService } from 'src/allergens/allergens.service';
 
 @Module({
   controllers: [RatingsController],

@@ -28,24 +28,35 @@ export class RecipesController {
     return this.recipesService.findAll();
   }
 
-
-  @Get('top5')
-  topFive() {
-    return this.recipesService.topfive();
-  }
-
-
+  /**
+   * visszaad egy specifikus receptet
+   * @param id 
+   * @returns receptet
+   */
   @Get('find:id')
   findOne(@Param('id') id: string) {
     return this.recipesService.findOne(+id);
   }
 
+  /**
+   * egy specifikus receptet frissít
+   * @param id 
+   * @param updateRecipeDto 
+   * @returns frissiti a receptet
+   */
   @Patch('update:id')
   @UseGuards(AuthGuard('bearer'))
   update(@Param('id') id: string, @Body() updateRecipeDto: UpdateRecipeDto) {
     return this.recipesService.update(+id, updateRecipeDto);
   }
 
+  /**
+   * egy specifikus update-ja de mivel admin mindenkit tud
+   * @param id 
+   * @param updateRecipeDto 
+   * @param req 
+   * @returns frissiti a receptet
+   */
   @Patch('update:admin')
   @UseGuards(AuthGuard('bearer'))
   updateManager(@Param('id') id: string, @Body() updateRecipeDto: UpdateRecipeDto, @Request() req) {
@@ -56,12 +67,23 @@ export class RecipesController {
     return this.recipesService.update(+id, updateRecipeDto);
   }
 
+  /**
+   * egy specifikus receptet kitörli
+   * @param id 
+   * @returns kitörölt recept
+   */
   @Delete('delete:id')
   @UseGuards(AuthGuard('bearer'))
   remove(@Param('id') id: string) {
     return this.recipesService.remove(+id);
   }
 
+  /**
+   * egy specifikus kitörli de mivel admin mindenkiét tudja
+   * @param id 
+   * @param req 
+   * @returns kitörölt recept
+   */
   @Delete('delete:admin')
   @UseGuards(AuthGuard('bearer'))
   removeManager(@Param('id') id: string, @Request() req) {
