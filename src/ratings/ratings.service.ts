@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateRatingDto } from './dto/create-rating.dto';
 import { UpdateRatingDto } from './dto/update-rating.dto';
 import { PrismaService } from 'src/prisma.service';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class RatingsService {
@@ -48,17 +49,10 @@ export class RatingsService {
   }
 
   avgRating(id : number){
-    return this.db.ratings.aggregate({
-      _avg : {
-        rating : true
-      },
-      where : {id}
-    })
+    return Prisma.raw(`SELECT AVG(rating) AS avg-rating FROM ratings WHERE user_id = ${id}`)
   }
 
   topFiveRating(){
-    return this.db.ratings.groupBy({
-      by : 'recipe_id',
-    })
+    return Prisma.raw('SELECT AVG(rating) AS rating, title FROM ratings INNER JOIN recipes ON rating.recipes_id = recipes.id GROUP BY recipes_id ORDER BY rating LIMIT 5')
   }
 }

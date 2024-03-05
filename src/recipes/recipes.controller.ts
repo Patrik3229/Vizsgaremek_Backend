@@ -29,16 +29,6 @@ export class RecipesController {
   }
 
   /**
-   * az aktuális top 5 adja vissza
-   * @returns lista ami a top 5 tartalmazza
-   */
-  @Get('top5')
-  topFive() {
-    return this.recipesService.topfive();
-  }
-
-
-  /**
    * visszaad egy specifikus receptet
    * @param id 
    * @returns receptet
