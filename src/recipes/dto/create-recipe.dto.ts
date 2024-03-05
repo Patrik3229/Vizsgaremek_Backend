@@ -1,4 +1,4 @@
-import { IsDateString, IsInt, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsDateString, IsEmpty, IsInt, IsNotEmpty, IsNumber, IsString } from "class-validator";
 
 export class CreateRecipeDto {
   @IsString()
@@ -17,7 +17,7 @@ export class CreateRecipeDto {
   preptime: number
 
   @IsDateString()
-  @IsNotEmpty()
+  @IsEmpty()
   posted: string
 
   @IsInt()

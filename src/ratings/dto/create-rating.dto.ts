@@ -1,4 +1,4 @@
-import { IsDateString, IsNotEmpty, IsNumber, IsString } from "class-validator"
+import { IsDateString, IsEmpty, IsNotEmpty, IsNumber, IsString } from "class-validator"
 
 export class CreateRatingDto {
   @IsNumber()
@@ -17,5 +17,6 @@ export class CreateRatingDto {
   content: string
 
   @IsDateString()
+  @IsEmpty()
   posted: string
 }
