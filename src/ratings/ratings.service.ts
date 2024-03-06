@@ -53,6 +53,6 @@ export class RatingsService {
   }
 
   topFiveRating(){
-    return Prisma.raw('SELECT AVG(rating) AS rating, title FROM ratings INNER JOIN recipes ON rating.recipes_id = recipes.id GROUP BY recipes_id ORDER BY rating LIMIT 5')
+    return this.db.$queryRaw`SELECT AVG(rating) AS rating, title FROM ratings INNER JOIN recipes ON rating.recipes_id = recipes.id GROUP BY recipes_id ORDER BY rating LIMIT 5`
   }
 }
