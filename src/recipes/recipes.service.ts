@@ -54,22 +54,14 @@ export class RecipesService {
     })
   }
 
-  searchConent(string : string){
+  searchConent(string : string, array : number[]){
     if(string == ""){
-      throw new BadRequestException('Üres string')
+      throw new BadRequestException('Empty string')
     }
-    return this.db.recipes.findMany({
-      where : {
-        title : {
-          contains : string
-        },
-        AND : {
-          description : {
-            contains : string
-          }
-        }
-      }
-    })
+    if(array.length == 0){
+      return this.db.$queryRaw`SELECT id, title, description, preptime, posted FROM recipes INNER JOIN recipe_allergens ON recipes.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id WHERE title LIKE ${string} AND description LIKE ${string}` 
+    }
+    return this.db.$queryRaw`SELECT id, title, description, preptime, posted FROM recipes INNER JOIN recipe_allergens ON recipes.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id WHERE title LIKE ${string} AND description LIKE ${string} AND allergens.id NOT IN ${array}`
   }
 
   searchAllergen(string : string){

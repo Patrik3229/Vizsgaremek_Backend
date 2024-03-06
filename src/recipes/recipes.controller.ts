@@ -19,6 +19,11 @@ export class RecipesController {
     return this.recipesService.create(createRecipeDto);
   }
 
+  @Get('searchContent')
+  search(searchText : string, salectedAllergens : number[]){
+    return this.recipesService.searchConent(searchText)
+  }
+
   /**
    * az összes receptet ki listázza
    * @returns egy listát a receptekből
