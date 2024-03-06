@@ -63,7 +63,7 @@ export class UsersService {
     return this.db.users.create({
       data : {
         email : createUserDto.email,
-        name : createUserDto.name,
+        name : createUserDto.username,
         password : secret,
         role : 'user'
 
@@ -113,7 +113,7 @@ export class UsersService {
       where: { id },
       data: {
         email: updateUserDto.email,
-        name: updateUserDto.name,
+        name: updateUserDto.username,
         password: updateUserDto.password,
       }
     })

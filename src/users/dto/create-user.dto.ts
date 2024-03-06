@@ -11,7 +11,7 @@ export class CreateUserDto {
   /**user neve */
   @IsString()
   @IsNotEmpty()
-  name: string
+  username: string
 
   /**user jelszava */
   @IsString()

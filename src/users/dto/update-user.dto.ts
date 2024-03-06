@@ -16,7 +16,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   passwordOld: string
 
   @Optional()
-  name?: string;
+  username?: string;
 
   @Optional()
   email?: string;
