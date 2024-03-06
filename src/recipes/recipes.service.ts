@@ -3,7 +3,6 @@ import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
 import { PrismaService } from 'src/prisma.service';
 import { AllergensService } from 'src/allergens/allergens.service';
-import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class RecipesService {
@@ -54,21 +53,15 @@ export class RecipesService {
     })
   }
 
+  //not sure if this okay NOT IN need to be checked!!
   searchConent(string : string, array : number[]){
     if(string == ""){
       throw new BadRequestException('Empty string')
     }
+    const stringSql = `'%${string}%'`
     if(array.length == 0){
-      return this.db.$queryRaw`SELECT id, title, description, preptime, posted FROM recipes INNER JOIN recipe_allergens ON recipes.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id WHERE title LIKE ${string} AND description LIKE ${string}` 
+      return this.db.$queryRaw`SELECT id, title, description, preptime, posted, AVG(ratings.rating) AS rating FROM recipes INNER JOIN recipe_allergens ON recipes.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON recipes.id = ratings.recipes_id WHERE title LIKE ${stringSql} AND description LIKE ${stringSql}` 
     }
-    return this.db.$queryRaw`SELECT id, title, description, preptime, posted FROM recipes INNER JOIN recipe_allergens ON recipes.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id WHERE title LIKE ${string} AND description LIKE ${string} AND allergens.id NOT IN ${array}`
-  }
-
-  searchAllergen(string : string){
-    if(string == ""){
-      throw new BadRequestException('Üres string')
-    } 
-    const id_allergen = this.allergen.findbyName(string)
-    return Prisma.raw(`SELECT id, title, description, preptime, posted FROM recipes INNER JOIN recipe_allergens ON recipes.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id WHERE allergens.id NOT ${id_allergen}`)
+    return this.db.$queryRaw`SELECT id, title, description, preptime, posted, AVG(ratings.rating) AS rating FROM recipes INNER JOIN recipe_allergens ON recipes.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON recipes.id = ratings.recipes_id WHERE title LIKE ${stringSql} AND description LIKE ${stringSql} AND allergens.id NOT IN ${array}`
   }
 }
