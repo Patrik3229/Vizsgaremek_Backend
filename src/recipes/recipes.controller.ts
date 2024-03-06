@@ -20,8 +20,8 @@ export class RecipesController {
   }
 
   @Get('searchContent')
-  search(searchText : string, salectedAllergens : number[]){
-    return this.recipesService.searchConent(searchText)
+  search(searchText : string, selectedAllergens : number[]){
+    return this.recipesService.searchConent(searchText, selectedAllergens)
   }
 
   /**
