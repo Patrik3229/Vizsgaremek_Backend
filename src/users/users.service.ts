@@ -121,6 +121,12 @@ export class UsersService {
     })
   }
 
+  /**
+   * user frissítés admin
+   * @param id 
+   * @param updateUserDto 
+   * @returns a módosított adatok
+   */
   updateRole(id: number, updateUserDto: UpdateUserDto) {
     return this.db.users.update({
       where: { id },
