@@ -91,7 +91,9 @@ export class UsersService {
   findOne(id: number) {
 
     /**id szerint van a search */
-    return `This action returns a #${id} user`;
+    return this.db.users.findUnique({
+      where : {id}
+    });
 
   }
 
