@@ -20,6 +20,12 @@ export class UsersService {
     })
   }
 
+  getRole(id : number){
+    return this.db.users.findUnique({
+      where : {id}
+    })
+  }
+
   /**
    * nev szerint kikeres
    * @param name 
