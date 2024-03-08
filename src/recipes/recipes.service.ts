@@ -8,6 +8,11 @@ import { AllergensService } from 'src/allergens/allergens.service';
 export class RecipesService {
   constructor(private readonly db : PrismaService, private readonly allergen : AllergensService) {}
 
+  /**
+   * új recept poszt csinál
+   * @param createRecipeDto 
+   * @returns új receptet ad vissza
+   */
   create(createRecipeDto: CreateRecipeDto) {
     return this.db.recipes.create({
       data: {
@@ -21,18 +26,33 @@ export class RecipesService {
     })
   }
 
+  /**
+   * kilistázza az összes receptet
+   * @returns listát a receptekről 5 hosszúságú
+   */
   findAll() {
     return this.db.recipes.findMany({
       take : 5
     })
   }
 
+  /**
+   * 1 recept adatinak a keresée
+   * @param id a recetp id amit meg akarunk keresni
+   * @returns a kersett recept adatai
+   */
   findOne(id: number) {
     return this.db.recipes.findUnique({
       where : {id}
     })
   }
 
+  /**
+   * 
+   * @param id a recept id-ja
+   * @param updateRecipeDto a modosítandó adatok 
+   * @returns 
+   */
   update(id: number, updateRecipeDto: UpdateRecipeDto) {
     return this.db.recipes.update({
       where : {id},
