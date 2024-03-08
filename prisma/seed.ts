@@ -22,7 +22,7 @@ async function seedAdmin(){
             name : "Manager User",
             /**az evn lévő megadott password hash-jük*/
             password : await hash(process.env.ADMIN_PASS),
-            role : "Manager"
+            role : "manager"
         }
     })
 }
