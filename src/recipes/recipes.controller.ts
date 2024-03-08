@@ -19,6 +19,12 @@ export class RecipesController {
     return this.recipesService.create(createRecipeDto);
   }
 
+  /**
+   * recept kereső
+   * @param searchText 
+   * @param selectedAllergens 
+   * @returns egy listát a megfelelő receptekről
+   */
   @Get('searchContent')
   search(searchText : string, selectedAllergens : number[]){
     return this.recipesService.searchConent(searchText, selectedAllergens)
