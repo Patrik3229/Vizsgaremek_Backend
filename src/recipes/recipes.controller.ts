@@ -30,6 +30,13 @@ export class RecipesController {
     return this.recipesService.searchConent(searchText, selectedAllergens)
   }
 
+  @Get('me:recipes')
+  @UseGuards(AuthGuard('bearer'))
+  meRecipes(@Request() req){
+    const user : Users = req.user
+    return this.recipesService.findMine(user.id)
+  }
+
   /**
    * az összes receptet ki listázza
    * @returns egy listát a receptekből

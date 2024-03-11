@@ -98,7 +98,10 @@ export class UsersService {
 
     /**id szerint van a search */
     return this.db.users.findUnique({
-      where : {id}
+      where : {id},
+      select : {
+        password : false
+      }
     });
 
   }
@@ -116,7 +119,6 @@ export class UsersService {
     if((updateUserDto.password != updateUserDto.passwordOld) && (updateUserDto.passwordAgain != updateUserDto.passwordOld)){
       throw new BadRequestException('A jelsó megegyezik a régivel')
     }
-    //regex
     return this.db.users.update({
       where: { id },
       data: {

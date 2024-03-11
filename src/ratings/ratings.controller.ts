@@ -3,7 +3,7 @@ import { RatingsService } from './ratings.service';
 import { CreateRatingDto } from './dto/create-rating.dto';
 import { UpdateRatingDto } from './dto/update-rating.dto';
 import { AuthGuard } from '@nestjs/passport/dist';
-import { Ratings } from '@prisma/client';
+import { Ratings, Users } from '@prisma/client';
 import { UsersService } from 'src/users/users.service';
 
 @Controller('ratings')
@@ -24,6 +24,13 @@ export class RatingsController {
   @Get('findOne')
   findOne(@Param('id') id: string) {
     return this.ratingsService.findOne(+id);
+  }
+  
+  @Get('me:rating')
+  @UseGuards(AuthGuard('bearer'))
+  meRating(@Request() req){
+    const user : Users = req.user
+    return this.ratingsService.findAllByUser(user.id)
   }
 
   @Patch('update')

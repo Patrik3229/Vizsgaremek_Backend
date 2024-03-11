@@ -36,6 +36,17 @@ export class RecipesService {
     })
   }
 
+  findMine(id : number){
+    return this.db.recipes.findMany({
+      where : {
+        user_id : id
+      },
+      select : {
+        content : false
+      }
+    })
+  }
+
   /**
    * 1 recept adatinak a keresée
    * @param id a recetp id amit meg akarunk keresni
@@ -48,7 +59,7 @@ export class RecipesService {
   }
 
   /**
-   * --------------
+   * recept frissítő
    * @param id a recept id-ja
    * @param updateRecipeDto a modosítandó adatok 
    * @returns 
@@ -79,9 +90,10 @@ export class RecipesService {
       throw new BadRequestException('Empty string')
     }
     const stringSql = `'%${string}%'`
+    //TODO: array összefűző to string és ellenőrző
     if(array.length == 0){
-      return this.db.$queryRaw`SELECT id, title, description, preptime, posted, AVG(ratings.rating) AS rating FROM recipes FULL JOIN recipe_allergens ON recipes.id = recipe_id FULL JOIN allergens ON recipe_allergens.allergen_id = allergens.id FULL JOIN ratings ON recipes.id = ratings.recipes_id WHERE title LIKE ${stringSql} OR description LIKE ${stringSql}` 
+      return this.db.$queryRaw`SELECT id, title, description, preptime, posted, AVG(ratings.rating) AS rating FROM recipes INNER JOIN recipe_allergens ON recipes.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON recipes.id = ratings.recipes_id WHERE title LIKE ${stringSql} OR recipes.description LIKE ${stringSql};` 
     }
-    return this.db.$queryRaw`SELECT id, title, description, preptime, posted, AVG(ratings.rating) AS rating FROM recipes FULL JOIN recipe_allergens ON recipes.id = recipe_id FULL JOIN allergens ON recipe_allergens.allergen_id = allergens.id FULL JOIN ratings ON recipes.id = ratings.recipes_id WHERE title LIKE ${stringSql} OR description LIKE ${stringSql} AND allergens.id NOT IN ${array}`
+    return this.db.$queryRaw`SELECT id, title, description, preptime, posted, AVG(ratings.rating) AS rating FROM recipes INNER JOIN recipe_allergens ON recipes.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON recipes.id = ratings.recipes_id WHERE title LIKE ${stringSql} OR recipes.description LIKE ${stringSql} AND allergens.id NOT IN ${array};`
   }
 }
