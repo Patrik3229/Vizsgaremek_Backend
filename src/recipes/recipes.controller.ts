@@ -7,7 +7,7 @@ import { Users } from '@prisma/client';
 
 @Controller('recipes')
 export class RecipesController {
-  constructor(private readonly recipesService: RecipesService) {}
+  constructor(private readonly recipesService: RecipesService) { }
 
   /**
    * új receptet fügvény
@@ -26,8 +26,15 @@ export class RecipesController {
    * @returns egy listát a megfelelő receptekről
    */
   @Get('searchContent')
-  search(searchText : string, selectedAllergens : number[]){
+  search(searchText: string, selectedAllergens: any[]) {
     return this.recipesService.searchConent(searchText, selectedAllergens)
+  }
+
+  @Get('me:recipes')
+  @UseGuards(AuthGuard('bearer'))
+  meRecipes(@Request() req) {
+    const user: Users = req.user
+    return this.recipesService.findMine(user.id)
   }
 
   /**
@@ -71,8 +78,8 @@ export class RecipesController {
   @Patch('update:admin')
   @UseGuards(AuthGuard('bearer'))
   updateManager(@Param('id') id: string, @Body() updateRecipeDto: UpdateRecipeDto, @Request() req) {
-    const user : Users = req.user
-    if(user.role != 'manager' && user.role != 'admin'){
+    const user: Users = req.user
+    if (user.role != 'manager' && user.role != 'admin') {
       throw new ForbiddenException()
     }
     return this.recipesService.update(+id, updateRecipeDto);
@@ -98,8 +105,8 @@ export class RecipesController {
   @Delete('delete:admin')
   @UseGuards(AuthGuard('bearer'))
   removeManager(@Param('id') id: string, @Request() req) {
-    const user : Users = req.user
-    if(user.role != 'manager' && user.role != 'admin'){
+    const user: Users = req.user
+    if (user.role != 'manager' && user.role != 'admin') {
       throw new ForbiddenException()
     }
     return this.recipesService.remove(+id);
