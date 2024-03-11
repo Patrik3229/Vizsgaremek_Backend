@@ -8,4 +8,4 @@
 </ul><br>
 <p>'npm run start:dev' vagy 'npm run start:debug'</p><br>
 <hr>
-<img src="https://media.tenor.com/L8uQHgpI1aYAAAAM/reikouwu2.gif" height="250">
+<img src="https://i.pinimg.com/originals/8c/bc/50/8cbc5047a05302ad130bb0c37879d0b1.gif" height="250">
