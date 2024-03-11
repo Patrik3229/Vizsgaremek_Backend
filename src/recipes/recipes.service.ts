@@ -84,16 +84,37 @@ export class RecipesService {
     })
   }
 
-  //not sure if this okay NOT IN need to be checked!!
-  searchConent(string : string, array : number[]){
+  searchConent(string : string, array : any[]){
     if(string == ""){
       throw new BadRequestException('Empty string')
     }
     const stringSql = `'%${string}%'`
-    //TODO: array összefűző to string és ellenőrző
+    const checkedArray : number[] = this.arrayChecker(array)
+    const arrayString : string = this.arrayToString(array)
     if(array.length == 0){
       return this.db.$queryRaw`SELECT id, title, description, preptime, posted, AVG(ratings.rating) AS rating FROM recipes INNER JOIN recipe_allergens ON recipes.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON recipes.id = ratings.recipes_id WHERE title LIKE ${stringSql} OR recipes.description LIKE ${stringSql};` 
     }
-    return this.db.$queryRaw`SELECT id, title, description, preptime, posted, AVG(ratings.rating) AS rating FROM recipes INNER JOIN recipe_allergens ON recipes.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON recipes.id = ratings.recipes_id WHERE title LIKE ${stringSql} OR recipes.description LIKE ${stringSql} AND allergens.id NOT IN ${array};`
+    return this.db.$queryRaw`SELECT id, title, description, preptime, posted, AVG(ratings.rating) AS rating FROM recipes INNER JOIN recipe_allergens ON recipes.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON recipes.id = ratings.recipes_id WHERE title LIKE ${stringSql} OR recipes.description LIKE ${stringSql} AND allergens.id NOT IN ${arrayString};`
+  }
+
+  arrayChecker(array : any[]){
+    for(let i = 0; i < array.length; i++){
+      if(!Number(array[i])){
+        throw new BadRequestException('Array contains something other than numbers')
+      }
+    }
+    return array
+  }
+
+  arrayToString(array : number[]) {
+    let string : string = "("
+    for(let i = 0; i < array.length; i++){
+      string = array[i].toString() + ", "
+      if(i == array.length-1){
+        string = array[i].toString()
+      }
+    }
+    string += ")"
+    return string
   }
 }
