@@ -26,7 +26,7 @@ export class RecipesController {
    * @returns egy listát a megfelelő receptekről
    */
   @Get('searchContent')
-  search(searchText : string, selectedAllergens : number[]){
+  search(searchText : string, selectedAllergens : any[]){
     return this.recipesService.searchConent(searchText, selectedAllergens)
   }
 
