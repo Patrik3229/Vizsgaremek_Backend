@@ -4,7 +4,7 @@ import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class AllergensService {
-  constructor(private readonly db : PrismaService) {}
+  constructor(private readonly db: PrismaService) { }
 
   /**
    * összes allergen visszaad
@@ -21,7 +21,7 @@ export class AllergensService {
    */
   findOne(id: number) {
     return this.db.allergens.findUnique({
-      where : {id}
+      where: { id }
     });
   }
 
@@ -32,13 +32,13 @@ export class AllergensService {
    */
   findbyName(name: string) {
     return this.db.allergens.findMany({
-      where : {
-        name : {
-          contains : name
+      where: {
+        name: {
+          contains: name
         }
       },
-      select : {
-        id : true
+      select: {
+        id: true
       }
     })
   }

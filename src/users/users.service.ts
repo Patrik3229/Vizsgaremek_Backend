@@ -20,9 +20,9 @@ export class UsersService {
     })
   }
 
-  getRole(id : number){
+  getRole(id: number) {
     return this.db.users.findUnique({
-      where : {id}
+      where: { id }
     })
   }
 
@@ -31,19 +31,19 @@ export class UsersService {
    * @param name 
    * @returns user adatokat
    */
-  findByName(name : string) {
+  findByName(name: string) {
     /**findmany mivel a nevek egyezhetnek */
     return this.db.users.findMany({
-      where : {
-        name : {
-          contains : name
+      where: {
+        name: {
+          contains: name
         }
       },
-      select : {
-        id : true,
-        email : true,
-        name : true,
-        role : true
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true
       }
     })
   }
@@ -53,25 +53,25 @@ export class UsersService {
    * @param password 
    * @returns hash jelszót
    */
-  async passwordHash(password : string) {
+  async passwordHash(password: string) {
     /**megadott password hash-eli */
     const secret = await argon2.hash(password)
     return secret
   }
-  
+
   /**
    * új User add hozzá
    * @param createUserDto 
    * @param secret 
    * @returns új felhasználót
    */
-  create(createUserDto: CreateUserDto, secret : string) {
+  create(createUserDto: CreateUserDto, secret: string) {
     return this.db.users.create({
-      data : {
-        email : createUserDto.email,
-        name : createUserDto.username,
-        password : secret,
-        role : 'user'
+      data: {
+        email: createUserDto.email,
+        name: createUserDto.username,
+        password: secret,
+        role: 'user'
 
       }
     })
@@ -83,8 +83,8 @@ export class UsersService {
    */
   findAll() {
     return this.db.users.findMany({
-      select : {
-        password : false
+      select: {
+        password: false
       }
     });
   }
@@ -98,9 +98,9 @@ export class UsersService {
 
     /**id szerint van a search */
     return this.db.users.findUnique({
-      where : {id},
-      select : {
-        password : false
+      where: { id },
+      select: {
+        password: false
       }
     });
 
@@ -113,10 +113,10 @@ export class UsersService {
    * @returns a módosított adatok
    */
   update(id: number, updateUserDto: UpdateUserDto) {
-    if(updateUserDto.password != updateUserDto.passwordAgain){
+    if (updateUserDto.password != updateUserDto.passwordAgain) {
       throw new BadRequestException('A jelszavak nem egyeznek!')
     }
-    if((updateUserDto.password != updateUserDto.passwordOld) && (updateUserDto.passwordAgain != updateUserDto.passwordOld)){
+    if ((updateUserDto.password != updateUserDto.passwordOld) && (updateUserDto.passwordAgain != updateUserDto.passwordOld)) {
       throw new BadRequestException('A jelsó megegyezik a régivel')
     }
     return this.db.users.update({

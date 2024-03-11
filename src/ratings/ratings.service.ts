@@ -6,60 +6,60 @@ import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class RatingsService {
-  constructor(private readonly db : PrismaService) {}
+  constructor(private readonly db: PrismaService) { }
 
   create(createRatingDto: CreateRatingDto) {
     return this.db.ratings.create({
-      data : {
-        content : createRatingDto.content,
-        rating : createRatingDto.rating,
-        recipe_id : createRatingDto.recipe_id,
-        user_id : createRatingDto.user_id
+      data: {
+        content: createRatingDto.content,
+        rating: createRatingDto.rating,
+        recipe_id: createRatingDto.recipe_id,
+        user_id: createRatingDto.user_id
       }
     });
   }
-  findAll(id : number){
+  findAll(id: number) {
     return this.db.ratings.findMany({
-      where  : {
-        recipe_id : id
+      where: {
+        recipe_id: id
       }
     })
   }
 
-  findAllByUser(user_id : number) {
+  findAllByUser(user_id: number) {
     return this.db.ratings.findMany({
-      where : {user_id}
+      where: { user_id }
     });
   }
 
   findOne(id: number) {
     return this.db.ratings.findUnique({
-      where : {id}
+      where: { id }
     });
   }
 
   update(id: number, updateRatingDto: UpdateRatingDto) {
     return this.db.ratings.update({
-      where : {id},
-      data : {
-        content : updateRatingDto.content,
-        rating : updateRatingDto.rating,
-        posted : Date.now.toString()
+      where: { id },
+      data: {
+        content: updateRatingDto.content,
+        rating: updateRatingDto.rating,
+        posted: Date.now.toString()
       }
     });
   }
 
   remove(id: number) {
     return this.db.ratings.delete({
-      where : {id}
+      where: { id }
     });
   }
 
-  avgRating(id : number){
+  avgRating(id: number) {
     return Prisma.raw(`SELECT AVG(rating) AS avg-rating FROM ratings WHERE user_id = ${id}`)
   }
 
-  topFiveRating(){
+  topFiveRating() {
     return this.db.$queryRaw`SELECT AVG(rating) AS rating, title FROM ratings INNER JOIN recipes ON rating.recipes_id = recipes.id GROUP BY recipes_id ORDER BY rating LIMIT 5`
   }
 }

@@ -37,12 +37,12 @@ export class UsersController {
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto) {
     /**regex leelenőrzi a jelszavkat */
-    if(!passwordRegex.test(createUserDto.password) || !passwordRegex.test(createUserDto.passwordAgain)){
+    if (!passwordRegex.test(createUserDto.password) || !passwordRegex.test(createUserDto.passwordAgain)) {
       /**hiba üzenet ha nem fele meg az egyik */
       throw new UnauthorizedException('A jeszók nem egyeznek meg az elvárásnak')
     }
     /**le ellenörzi hogy a megadott jelszók egyeznek */
-    if(createUserDto.password != createUserDto.passwordAgain){
+    if (createUserDto.password != createUserDto.passwordAgain) {
       /**hiba üzenet a nem egyező jelszavaknál */
       throw new UnauthorizedException('A jelszavak nem egyeznek')
     }
