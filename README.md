@@ -4,7 +4,7 @@
 <ul>
     <li>Kovács Patrik</li>
     <li>Fecske Márk</li>
-    <li>Elekes Fanni</li>
+    <li><b>Elekes Fanni</b></li>
 </ul><br>
 <p>'npm run start:dev' vagy 'npm run start:debug'</p><br>
 <hr>
