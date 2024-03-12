@@ -36,6 +36,11 @@ export class RecipesService {
     })
   }
 
+  /**
+   * saját recepteket kereső
+   * @param id 
+   * @returns kikeresi az összes receptet ami a felhasználóé
+   */
   findMine(id: number) {
     return this.db.recipes.findMany({
       where: {
@@ -78,25 +83,50 @@ export class RecipesService {
     })
   }
 
+  /**
+   * receptet töröl ki
+   * @param id 
+   * @returns kitörölt recept
+   */
   remove(id: number) {
     return this.db.recipes.delete({
       where: { id }
     })
   }
 
+  /**
+   * kereső tartalom és allegens szerint
+   * @param string keresőben lévő szöveg
+   * @param array allergene az id tömbje (lehet 1 is)
+   * @returns a keresésnek megfelelő receptek
+   */
   searchConent(string: string, array: any[]) {
+    /**megnézzuk hogy a szöveg nem üres */
     if (string == "") {
       throw new BadRequestException('Empty string')
     }
     const stringSql = `'%${string}%'`
+    /**megnézzük hogy a tömb csak szamokat tartalmazz */
     const checkedArray: number[] = this.arrayChecker(array)
-    const arrayString: string = this.arrayToString(checkedArray)
+    /**ha nincs allergen */
     if (array.length == 0) {
       return this.db.$queryRaw`SELECT id, title, description, preptime, posted, AVG(ratings.rating) AS rating FROM recipes INNER JOIN recipe_allergens ON recipes.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON recipes.id = ratings.recipes_id WHERE title LIKE ${stringSql} OR recipes.description LIKE ${stringSql};`
     }
+    /**ha van allergen = 1 */
+    if(array.length == 1){
+      return this.db.$queryRaw`SELECT id, title, description, preptime, posted, AVG(ratings.rating) AS rating FROM recipes INNER JOIN recipe_allergens ON recipes.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON recipes.id = ratings.recipes_id WHERE title LIKE ${stringSql} OR recipes.description LIKE ${stringSql} AND allergens.id NOT ${checkedArray[0]};` 
+    }
+    /**mysql formatumhoz stringgé csináljuk az array */
+    const arrayString: string = this.arrayToString(checkedArray)
+    /**ha van allergen > 1 */
     return this.db.$queryRaw`SELECT id, title, description, preptime, posted, AVG(ratings.rating) AS rating FROM recipes INNER JOIN recipe_allergens ON recipes.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON recipes.id = ratings.recipes_id WHERE title LIKE ${stringSql} OR recipes.description LIKE ${stringSql} AND allergens.id NOT IN ${arrayString};`
   }
 
+  /**
+   * tönb ellenörző
+   * @param array 
+   * @returns ugyanazt az any array de az ellenörőn átment
+   */
   arrayChecker(array: any[]) {
     for (let i = 0; i < array.length; i++) {
       if (!Number(array[i])) {
@@ -106,6 +136,11 @@ export class RecipesService {
     return array
   }
 
+  /**
+   * mysql not in kellően string converter
+   * @param array 
+   * @returns a helyes megformázott string
+   */
   arrayToString(array: number[]) {
     let string: string = "("
     for (let i = 0; i < array.length; i++) {
