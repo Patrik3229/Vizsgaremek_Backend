@@ -20,9 +20,17 @@ export class UsersService {
     })
   }
 
+  /**
+   * role kereső id szerint
+   * @param id 
+   * @returns a felhasznaló role-jat
+   */
   getRole(id: number) {
     return this.db.users.findUnique({
-      where: { id }
+      where: { id },
+      select : {
+        password : false
+      }
     })
   }
 
@@ -114,10 +122,10 @@ export class UsersService {
    */
   update(id: number, updateUserDto: UpdateUserDto) {
     if (updateUserDto.password != updateUserDto.passwordAgain) {
-      throw new BadRequestException('A jelszavak nem egyeznek!')
+      throw new BadRequestException(`The passwords doesn't match`)
     }
     if ((updateUserDto.password != updateUserDto.passwordOld) && (updateUserDto.passwordAgain != updateUserDto.passwordOld)) {
-      throw new BadRequestException('A jelsó megegyezik a régivel')
+      throw new BadRequestException('The passowrd is the same as the previous')
     }
     return this.db.users.update({
       where: { id },
@@ -150,17 +158,9 @@ export class UsersService {
    * @returns törlést
    */
   remove(id: number) {
-
     /**id szerint törlünk */
     return this.db.users.delete({
       where: { id }
     })
-  }
-
-  removeManager(id: number) {
-    return this.db.users.delete({
-      where: { id }
-    })
-
   }
 }

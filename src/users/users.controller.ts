@@ -39,12 +39,12 @@ export class UsersController {
     /**regex leelenőrzi a jelszavkat */
     if (!passwordRegex.test(createUserDto.password) || !passwordRegex.test(createUserDto.passwordAgain)) {
       /**hiba üzenet ha nem fele meg az egyik */
-      throw new UnauthorizedException('A jeszók nem egyeznek meg az elvárásnak')
+      throw new UnauthorizedException('Weak password, atleast 8 charater long contains 1 upper case, 1 lowercase and 1 number')
     }
     /**le ellenörzi hogy a megadott jelszók egyeznek */
     if (createUserDto.password != createUserDto.passwordAgain) {
       /**hiba üzenet a nem egyező jelszavaknál */
-      throw new UnauthorizedException('A jelszavak nem egyeznek')
+      throw new UnauthorizedException(`Passwords doesn't match`)
     }
     /**jelzsót hashjük */
     const secret = await this.usersService.passwordHash(createUserDto.password)
@@ -65,7 +65,7 @@ export class UsersController {
     const user: Users = req.user;
     /**token alapján megnézzük a user jogosultságát */
     if (user.role != 'admin' && user.role != 'manager') {
-      throw new ForbiddenException('Ehhez nincs jogosultságod');
+      throw new ForbiddenException(`You don't have premission to do this`);
     }
     return this.usersService.findAll();
   }
@@ -109,23 +109,36 @@ export class UsersController {
     if (user.role != 'manager') {
       throw new ForbiddenException();
     }
-
     return this.usersService.update(+id, updateUserDto);
   }
 
+  /**
+   * a belejelenkezett felhasználot kitörli
+   * @param id 
+   * @returns kitörli a felhasználót
+   */
   @Delete('delete')
-  remove(@Param('id') id: string) {
+  @UseGuards(AuthGuard('bearer'))
+  remove(@Param('id') id: string, @Request() req) {
+    const user: Users = req.user
+    if(user.id != parseInt(id)){
+      throw new ForbiddenException(`You don't have premissoin to do this`)
+    }
     return this.usersService.remove(+id);
   }
 
-  @Delete('update:admin')
+  /**
+   * admin/manager által bárki kitörlést
+   * @param id 
+   * @param req 
+   * @returns kitöröli a felhasználót
+   */
+  @Delete('delete:admin')
   removeManager(@Param('id') id: string, @Request() req) {
-
     const user: Users = req.user;
-    if (user.role != 'manager') {
+    if (user.role != 'manager' && user.role != 'admin') {
       throw new ForbiddenException();
     }
-
-    return this.usersService.removeManager(+id);
+    return this.usersService.remove(+id);
   }
 }
