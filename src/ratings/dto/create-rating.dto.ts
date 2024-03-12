@@ -6,7 +6,7 @@ import { IsDateString, IsEmpty, IsNotEmpty, IsNumber, IsString, Max, Min } from 
 export class CreateRatingDto {
   /**a postoló id-ja */
   @IsNumber()
-  @IsNotEmpty()
+  @IsEmpty()
   user_id: number
 
   /**annak a receptnek az id ahová comment-el */

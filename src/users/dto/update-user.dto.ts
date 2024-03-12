@@ -12,6 +12,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsNotEmpty()
   id: number
 
+  /**a user régi jelszó */
   @Optional()
   passwordOld: string
 
