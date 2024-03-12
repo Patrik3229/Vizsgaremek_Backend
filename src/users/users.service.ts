@@ -29,7 +29,10 @@ export class UsersService {
     return this.db.users.findUnique({
       where: { id },
       select : {
-        password : false
+        password : false,
+        email : false,
+        id : false,
+        name : false
       }
     })
   }

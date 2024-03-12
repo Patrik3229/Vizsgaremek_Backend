@@ -8,13 +8,13 @@ import { Prisma } from '@prisma/client';
 export class RatingsService {
   constructor(private readonly db: PrismaService) { }
 
-  create(createRatingDto: CreateRatingDto) {
+  create(createRatingDto: CreateRatingDto, user_id : number) {
     return this.db.ratings.create({
       data: {
         content: createRatingDto.content,
         rating: createRatingDto.rating,
         recipe_id: createRatingDto.recipe_id,
-        user_id: createRatingDto.user_id
+        user_id: user_id
       }
     });
   }
