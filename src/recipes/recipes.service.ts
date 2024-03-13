@@ -101,7 +101,7 @@ export class RecipesService {
    * @returns a keresésnek megfelelő receptek
    */
   searchConent(string: string, array: any[]) {
-    /**megnézzuk hogy a szöveg nem üres */
+    /**megnézzük hogy a szöveg nem üres */
     if (string == "") {
       throw new BadRequestException('Empty string')
     }
