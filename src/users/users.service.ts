@@ -96,7 +96,7 @@ export class UsersService {
     return this.db.users.findMany({
       select: {
         password: false
-      }
+      } 
     });
   }
 
@@ -127,7 +127,7 @@ export class UsersService {
     if (updateUserDto.password != updateUserDto.passwordAgain) {
       throw new BadRequestException(`The passwords doesn't match`)
     }
-    if ((updateUserDto.password != updateUserDto.passwordOld) && (updateUserDto.passwordAgain != updateUserDto.passwordOld)) {
+    if ((updateUserDto.password == updateUserDto.passwordOld) && (updateUserDto.passwordAgain == updateUserDto.passwordOld)) {
       throw new BadRequestException('The passowrd is the same as the previous')
     }
     return this.db.users.update({

@@ -37,8 +37,9 @@ export class RatingsController {
    * @param id 
    * @returns a specifikus ratinget
    */
-  @Get('findOne')
+  @Get('find:id')
   findOne(@Param('id') id: string) {
+    console.log('ez a id:' + id)
     return this.ratingsService.findOne(+id);
   }
 
