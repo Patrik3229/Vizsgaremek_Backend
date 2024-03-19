@@ -28,11 +28,11 @@ export class UsersService {
   getRole(id: number) {
     return this.db.users.findUnique({
       where: { id },
-      select : {
-        password : false,
-        email : false,
-        id : false,
-        name : false
+      select: {
+        password: false,
+        email: false,
+        id: false,
+        name: false
       }
     })
   }
@@ -49,12 +49,6 @@ export class UsersService {
         name: {
           contains: name
         }
-      },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        role: true
       }
     })
   }
@@ -88,15 +82,39 @@ export class UsersService {
     })
   }
 
-  /**
-   * user listázó
-   * @returns minden létező user-t
-   */
-  findAll() {
+  searchAdmin(id: number, string : string) {
     return this.db.users.findMany({
+      where: {
+        NOT: {
+          id : id
+        },
+        name : {
+          contains : string
+        },
+        email : {
+          contains : string
+        }
+      },
       select: {
         password: false
-      } 
+      }
+    })
+  }
+
+  /**
+   * user listázó
+   * @returns minden létező user-t kivétel saját magát
+   */
+  findAll(id: number) {
+    return this.db.users.findMany({
+      where: {
+        NOT: {
+          id
+        }
+      },
+      select: {
+        password: false
+      }
     });
   }
 
@@ -123,19 +141,23 @@ export class UsersService {
    * @param updateUserDto 
    * @returns a módosított adatok
    */
-  update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: number, updateUserDto: UpdateUserDto) {
     if (updateUserDto.password != updateUserDto.passwordAgain) {
       throw new BadRequestException(`The passwords doesn't match`)
     }
     if ((updateUserDto.password == updateUserDto.passwordOld) && (updateUserDto.passwordAgain == updateUserDto.passwordOld)) {
       throw new BadRequestException('The passowrd is the same as the previous')
     }
+
     return this.db.users.update({
       where: { id },
       data: {
         email: updateUserDto.email,
         name: updateUserDto.username,
-        password: updateUserDto.password,
+        password: await this.passwordHash(updateUserDto.password),
+      },
+      select: {
+        password: false
       }
     })
   }

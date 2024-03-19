@@ -4,10 +4,11 @@ import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { Users } from '@prisma/client';
+import { UsersService } from 'src/users/users.service';
 
 @Controller('recipes')
 export class RecipesController {
-  constructor(private readonly recipesService: RecipesService) { }
+  constructor(private readonly recipesService: RecipesService, private readonly usersService : UsersService) { }
 
   /**
    * új receptet fügvény
@@ -56,6 +57,16 @@ export class RecipesController {
     return this.recipesService.findOne(+id);
   }
 
+  @Get('search-user:id')
+  @UseGuards(AuthGuard('bearer'))
+  NameSearch(@Param('id') id: string, @Request() req){
+    const user : Users = req.user
+    if (user.role != 'manager' && user.role != 'admin') {
+      throw new ForbiddenException()
+    }
+    return this.recipesService.findAllUser(+id);
+  }
+
   /**
    * egy specifikus receptet frissít
    * @param id 
@@ -75,7 +86,7 @@ export class RecipesController {
    * @param req 
    * @returns frissiti a receptet
    */
-  @Patch('update:admin')
+  @Patch('update-admin:id')
   @UseGuards(AuthGuard('bearer'))
   updateManager(@Param('id') id: string, @Body() updateRecipeDto: UpdateRecipeDto, @Request() req) {
     const user: Users = req.user
@@ -92,7 +103,11 @@ export class RecipesController {
    */
   @Delete('delete:id')
   @UseGuards(AuthGuard('bearer'))
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: string, @Request() req) {
+    const user : Users = req.user
+    if(user.id != parseInt(id)){
+      throw new ForbiddenException()
+    }
     return this.recipesService.remove(+id);
   }
 
@@ -102,7 +117,7 @@ export class RecipesController {
    * @param req 
    * @returns kitörölt recept
    */
-  @Delete('delete:admin')
+  @Delete('delete-admin:id')
   @UseGuards(AuthGuard('bearer'))
   removeManager(@Param('id') id: string, @Request() req) {
     const user: Users = req.user

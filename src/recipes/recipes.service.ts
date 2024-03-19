@@ -52,6 +52,12 @@ export class RecipesService {
     })
   }
 
+  findAllUser(id : number){
+    return this.db.recipes.findMany({
+      where : {id}
+    })
+  }
+
   /**
    * 1 recept adatinak a keresée
    * @param id a recetp id amit meg akarunk keresni
