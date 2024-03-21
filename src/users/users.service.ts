@@ -3,6 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma.service';
 import * as argon2 from "argon2";
+import { roleUpdateDto } from './dto/role-update.dto';
 
 
 @Injectable()
@@ -168,11 +169,11 @@ export class UsersService {
    * @param updateUserDto 
    * @returns a módosított adatok
    */
-  updateRole(id: number, updateUserDto: UpdateUserDto) {
+  updateRole(id: number, roleUpdate: roleUpdateDto) {
     return this.db.users.update({
       where: { id },
       data: {
-        role: updateUserDto.role
+        role: roleUpdate.role
       }
     })
   }

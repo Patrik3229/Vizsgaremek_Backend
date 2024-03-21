@@ -23,4 +23,9 @@ export class AllergensController {
   findOne(@Param('id') id: string) {
     return this.allergensService.findOne(+id);
   }
+
+  @Get('find-recipe:id')
+  findrecipe(@Param('id') id:string){
+    return this.allergensService.findRecipeAllergen(+id);
+  }
 }

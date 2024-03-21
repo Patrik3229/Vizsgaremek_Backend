@@ -4,6 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Users } from '@prisma/client';
 import { AuthGuard } from '@nestjs/passport';
+import { roleUpdateDto } from './dto/role-update.dto';
 
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/
 
@@ -106,18 +107,18 @@ export class UsersController {
 
 
   /**
-   * egy user adatait tudja kitörölni
+   * egy user adatait tudja kitörölni rankot
    * @param id user id
    * @returns kitöli az adatokat -> egyből ki jelenkezteti
    */
-  @Patch('update:admin:id')
+  @Patch('update-admin:id')
   @UseGuards(AuthGuard('bearer'))
-  updateRole(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @Request() req) {
+  updateRole(@Param('id') id: string, @Body() role: roleUpdateDto, @Request() req) {
     const user: Users = req.user;
     if (user.role != 'manager') {
       throw new ForbiddenException();
     }
-    return this.usersService.update(+id, updateUserDto);
+    return this.usersService.updateRole(+id, role);
   }
 
   /**

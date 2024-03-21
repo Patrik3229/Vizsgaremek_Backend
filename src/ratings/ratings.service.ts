@@ -18,12 +18,8 @@ export class RatingsService {
       }
     });
   }
-  findAll(id: number) {
-    return this.db.ratings.findMany({
-      where: {
-        recipe_id: id
-      }
-    })
+  findAll() {
+    return this.db.ratings.findMany()
   }
 
   findAllByUser(user_id: number) {

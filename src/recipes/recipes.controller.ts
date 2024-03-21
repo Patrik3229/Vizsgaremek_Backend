@@ -62,7 +62,7 @@ export class RecipesController {
   NameSearch(@Param('id') id: string, @Request() req){
     const user : Users = req.user
     if (user.role != 'manager' && user.role != 'admin') {
-      throw new ForbiddenException()
+      throw new ForbiddenException('You dont have premmision for it')
     }
     return this.recipesService.findAllUser(+id);
   }
@@ -91,7 +91,7 @@ export class RecipesController {
   updateManager(@Param('id') id: string, @Body() updateRecipeDto: UpdateRecipeDto, @Request() req) {
     const user: Users = req.user
     if (user.role != 'manager' && user.role != 'admin') {
-      throw new ForbiddenException()
+      throw new ForbiddenException('You dont have premmision for it')
     }
     return this.recipesService.update(+id, updateRecipeDto);
   }
@@ -106,7 +106,7 @@ export class RecipesController {
   remove(@Param('id') id: string, @Request() req) {
     const user : Users = req.user
     if(user.id != parseInt(id)){
-      throw new ForbiddenException()
+      throw new ForbiddenException('You dont have premmision for it')
     }
     return this.recipesService.remove(+id);
   }
@@ -122,7 +122,7 @@ export class RecipesController {
   removeManager(@Param('id') id: string, @Request() req) {
     const user: Users = req.user
     if (user.role != 'manager' && user.role != 'admin') {
-      throw new ForbiddenException()
+      throw new ForbiddenException('You dont have premmision for it')
     }
     return this.recipesService.remove(+id);
   }
