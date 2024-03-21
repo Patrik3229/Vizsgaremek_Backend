@@ -3,6 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma.service';
 import * as argon2 from "argon2";
+import { roleUpdateDto } from './dto/role-update.dto';
 
 
 @Injectable()
@@ -28,11 +29,11 @@ export class UsersService {
   getRole(id: number) {
     return this.db.users.findUnique({
       where: { id },
-      select : {
-        password : false,
-        email : false,
-        id : false,
-        name : false
+      select: {
+        password: false,
+        email: false,
+        id: false,
+        name: false
       }
     })
   }
@@ -49,12 +50,6 @@ export class UsersService {
         name: {
           contains: name
         }
-      },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        role: true
       }
     })
   }
@@ -88,12 +83,36 @@ export class UsersService {
     })
   }
 
+  searchAdmin(id: number, string : string) {
+    return this.db.users.findMany({
+      where: {
+        NOT: {
+          id : id
+        },
+        name : {
+          contains : string
+        },
+        email : {
+          contains : string
+        }
+      },
+      select: {
+        password: false
+      }
+    })
+  }
+
   /**
    * user listázó
-   * @returns minden létező user-t
+   * @returns minden létező user-t kivétel saját magát
    */
-  findAll() {
+  findAll(id: number) {
     return this.db.users.findMany({
+      where: {
+        NOT: {
+          id
+        }
+      },
       select: {
         password: false
       }
@@ -123,19 +142,23 @@ export class UsersService {
    * @param updateUserDto 
    * @returns a módosított adatok
    */
-  update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: number, updateUserDto: UpdateUserDto) {
     if (updateUserDto.password != updateUserDto.passwordAgain) {
       throw new BadRequestException(`The passwords doesn't match`)
     }
-    if ((updateUserDto.password != updateUserDto.passwordOld) && (updateUserDto.passwordAgain != updateUserDto.passwordOld)) {
+    if ((updateUserDto.password == updateUserDto.passwordOld) && (updateUserDto.passwordAgain == updateUserDto.passwordOld)) {
       throw new BadRequestException('The passowrd is the same as the previous')
     }
+
     return this.db.users.update({
       where: { id },
       data: {
         email: updateUserDto.email,
         name: updateUserDto.username,
-        password: updateUserDto.password,
+        password: await this.passwordHash(updateUserDto.password),
+      },
+      select: {
+        password: false
       }
     })
   }
@@ -146,11 +169,11 @@ export class UsersService {
    * @param updateUserDto 
    * @returns a módosított adatok
    */
-  updateRole(id: number, updateUserDto: UpdateUserDto) {
+  updateRole(id: number, roleUpdate: roleUpdateDto) {
     return this.db.users.update({
       where: { id },
       data: {
-        role: updateUserDto.role
+        role: roleUpdate.role
       }
     })
   }

@@ -10,11 +10,12 @@ export class RecipesService {
 
   /**
    * új recept poszt csinál
-   * @param createRecipeDto 
+   * @param createRecipeDto a user altal bekuldott adatok, a body talalhato adatok
    * @returns új receptet ad vissza
    */
-  create(createRecipeDto: CreateRecipeDto) {
-    return this.db.recipes.create({
+  async create(createRecipeDto: CreateRecipeDto) {
+    const allergens = createRecipeDto.allergens
+    const recipe = await this.db.recipes.create({
       data: {
         title: createRecipeDto.title,
         description: createRecipeDto.description,
@@ -24,6 +25,16 @@ export class RecipesService {
         preptime: createRecipeDto.preptime
       }
     })
+    /**a kapcsolo tablahoz felvesszuk */
+    for(let i= 0; i < allergens.length; i++){
+      this.db.recipe_Allergens.create({
+        data : {
+          allergen_id : allergens[i],
+          recipe_id : recipe.id
+        }
+      })
+    }
+    return recipe
   }
 
   /**
@@ -49,6 +60,12 @@ export class RecipesService {
       select: {
         content: false
       }
+    })
+  }
+
+  findAllUser(id : number){
+    return this.db.recipes.findMany({
+      where : {id}
     })
   }
 
@@ -101,7 +118,7 @@ export class RecipesService {
    * @returns a keresésnek megfelelő receptek
    */
   searchConent(string: string, array: any[]) {
-    /**megnézzuk hogy a szöveg nem üres */
+    /**megnézzük hogy a szöveg nem üres */
     if (string == "") {
       throw new BadRequestException('Empty string')
     }

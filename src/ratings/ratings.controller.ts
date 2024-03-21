@@ -28,8 +28,14 @@ export class RatingsController {
    * @returns rating tömböt
    */
   @Get('getAll')
-  findAll(id: number) {
-    return this.ratingsService.findAll(id);
+  @UseGuards(AuthGuard('bearer'))
+  async findAll(@Request() req) {
+    const rating: Ratings = req.rating
+    const role = await this.user.getRole(rating.user_id)
+    if (role != "manager" && role != "admin") {
+      throw new UnauthorizedException("You dont have premmision for it")
+    }
+    return this.ratingsService.findAll();
   }
 
   /**
@@ -37,7 +43,7 @@ export class RatingsController {
    * @param id 
    * @returns a specifikus ratinget
    */
-  @Get('findOne')
+  @Get('find:id')
   findOne(@Param('id') id: string) {
     return this.ratingsService.findOne(+id);
   }
@@ -73,15 +79,15 @@ export class RatingsController {
    * @param id 
    * @returns 
    */
-  @Patch('updateAdmin')
+  @Patch('updateAdmin:id')
   @UseGuards(AuthGuard('bearer'))
-  async updateAdmin(@Request() req, @Body() updateRatingDto: UpdateRatingDto, id: number) {
+  async updateAdmin(@Request() req, @Body() updateRatingDto: UpdateRatingDto,@Param('id') id: string) {
     const rating: Ratings = req.rating
     const role = await this.user.getRole(rating.user_id)
     if (role != "manager" && role != "admin") {
       throw new UnauthorizedException("You dont have premmision for it")
     }
-    return this.ratingsService.update(id, updateRatingDto);
+    return this.ratingsService.update(+id, updateRatingDto);
   }
 
   /**
@@ -102,9 +108,9 @@ export class RatingsController {
    * @param id 
    * @returns 
    */
-  @Delete('deleteadmin')
+  @Delete('deleteadmin:id')
   @UseGuards(AuthGuard('bearer'))
-  async removeAdmin(@Request() req, id: number) {
+  async removeAdmin(@Request() req,@Param('id') id: number) {
     const rating: Ratings = req.rating
     const role = await this.user.getRole(rating.user_id)
     if (role != "manager" && role != "admin") {

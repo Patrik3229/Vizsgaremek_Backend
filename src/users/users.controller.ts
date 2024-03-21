@@ -4,6 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Users } from '@prisma/client';
 import { AuthGuard } from '@nestjs/passport';
+import { roleUpdateDto } from './dto/role-update.dto';
 
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/
 
@@ -67,7 +68,7 @@ export class UsersController {
     if (user.role != 'admin' && user.role != 'manager') {
       throw new ForbiddenException(`You don't have premission to do this`);
     }
-    return this.usersService.findAll();
+    return this.usersService.findAll(user.id);
   }
 
   /**
@@ -81,7 +82,15 @@ export class UsersController {
     return this.usersService.findOne(+id);
   }
 
-  //TODO:findbyName
+  @Get('search:string')
+  @UseGuards(AuthGuard('bearer'))
+  AdminUserSearch(@Param('string') string : string,@Request() req) {
+    const user: Users = req.user;
+    if (user.role != 'manager' && user.role != 'admin') {
+      throw new ForbiddenException(`You don't have premissoin to do this`);
+    }
+    return this.usersService.searchAdmin(user.id, string)
+  }
 
   /**
    * a bejelenkezett user adatait frissítése
@@ -89,7 +98,7 @@ export class UsersController {
    * @param updateUserDto megváltoztatni való adatok
    * @returns adatbázisban megváltoztatja az adatokat
    */
-  @Patch('update')
+  @Patch('update:id')
   @UseGuards(AuthGuard('bearer'))
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     //TODO new password hash
@@ -98,18 +107,18 @@ export class UsersController {
 
 
   /**
-   * egy user adatait tudja kitörölni
+   * egy user adatait tudja kitörölni rankot
    * @param id user id
    * @returns kitöli az adatokat -> egyből ki jelenkezteti
    */
-  @Patch('update:admin')
+  @Patch('update-admin:id')
   @UseGuards(AuthGuard('bearer'))
-  updateRole(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @Request() req) {
+  updateRole(@Param('id') id: string, @Body() role: roleUpdateDto, @Request() req) {
     const user: Users = req.user;
     if (user.role != 'manager') {
       throw new ForbiddenException();
     }
-    return this.usersService.update(+id, updateUserDto);
+    return this.usersService.updateRole(+id, role);
   }
 
   /**
@@ -117,11 +126,11 @@ export class UsersController {
    * @param id 
    * @returns kitörli a felhasználót
    */
-  @Delete('delete')
+  @Delete('delete-self:id')
   @UseGuards(AuthGuard('bearer'))
-  remove(@Param('id') id: string, @Request() req) {
+  removeSelf(@Param('id') id: string, @Request() req) {
     const user: Users = req.user
-    if(user.id != parseInt(id)){
+    if (user.id != parseInt(id)) {
       throw new ForbiddenException(`You don't have premissoin to do this`)
     }
     return this.usersService.remove(+id);
@@ -133,11 +142,12 @@ export class UsersController {
    * @param req 
    * @returns kitöröli a felhasználót
    */
-  @Delete('delete:admin')
-  removeManager(@Param('id') id: string, @Request() req) {
+  @Delete('delete:id')
+  @UseGuards(AuthGuard('bearer'))
+  remove(@Param('id') id: string, @Request() req) {
     const user: Users = req.user;
     if (user.role != 'manager' && user.role != 'admin') {
-      throw new ForbiddenException();
+      throw new ForbiddenException(`You don't have premissoin to do this`);
     }
     return this.usersService.remove(+id);
   }

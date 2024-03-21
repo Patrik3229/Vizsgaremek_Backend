@@ -42,4 +42,8 @@ export class AllergensService {
       }
     })
   }
+
+  findRecipeAllergen(id : number){
+    return this.db.$queryRaw`SELECT name FROM Allergens INNER JOIN recipe_allergens ON allergens.id = allergen_id INNER JOIN recipes ON recipe_allergens.recipes_id = recipes.id WHERE recipes.id = ${id}`
+  }
 }
