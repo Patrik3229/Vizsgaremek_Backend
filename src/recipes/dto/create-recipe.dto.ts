@@ -35,4 +35,9 @@ export class CreateRecipeDto {
   @IsInt()
   @IsNotEmpty()
   user_id: number
+
+  /**a recepthez tartozo allergen id-ja */
+  @IsNotEmpty()
+  @IsNumber()
+  allergens: number[]
 }

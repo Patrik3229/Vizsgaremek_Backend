@@ -8,7 +8,7 @@ import { UsersService } from 'src/users/users.service';
 
 @Controller('recipes')
 export class RecipesController {
-  constructor(private readonly recipesService: RecipesService, private readonly usersService : UsersService) { }
+  constructor(private readonly recipesService: RecipesService) { }
 
   /**
    * új receptet fügvény
