@@ -185,6 +185,11 @@ export class RecipesService {
     return string
   }
 
+  /**
+   * az updatenál kitörölenő allergens id a kapcsolótablából
+   * @param id recept id-ja
+   * @param removedAllergens kitörölendő id-k
+   */
   RemovedAllergens(id: number, removedAllergens: number[]) {
     this.db.recipe_Allergens.deleteMany({
       where: {
@@ -198,14 +203,19 @@ export class RecipesService {
     })
   }
 
-    CreateAllergens(id: number, createAllergens: number[]) {
-      createAllergens.forEach(element => {
-        this.db.recipe_Allergens.create({
-          data : {
-            allergen_id : element,
-            recipe_id : id
-          }
-        })
-      });
-    }
+  /**
+   * az updatenál hozzáadandó allergens id a kapcsolótablából
+   * @param id recept id-ja
+   * @param createAllergens hozzáadandó id-k
+   */
+  CreateAllergens(id: number, createAllergens: number[]) {
+    createAllergens.forEach(element => {
+      this.db.recipe_Allergens.create({
+        data : {
+          allergen_id : element,
+          recipe_id : id
+        }
+      })
+    });
+  }
   }
