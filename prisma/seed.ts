@@ -26,7 +26,8 @@ async function seedAdmin() {
             role: "manager"
         }
     })
-    otherSeed()
+    otherSeed() //for testing
+    //AllergensFinalSeed() //for final ver
 }
 
 async function otherSeed() {
@@ -80,5 +81,21 @@ async function otherSeed() {
             }
         })
     }
+}
+
+async function AllergensFinalSeed(){
+try {
+    const response = await fetch("./allergens.json")
+    const x = await response.json() as Allergen[]
+    for (let i = 0; i < x.length; i++) {
+        prisma.allergens.create({
+            data : {
+                name : x[i].name
+            }
+        })
+    }
+} catch {
+    console.log('hiba a allergens-el')
+}
 }
 seedAdmin()
