@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, GoneException, Injectable } from '@nestjs/common';
 import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
 import { PrismaService } from 'src/prisma.service';
@@ -26,11 +26,11 @@ export class RecipesService {
       }
     })
     /**a kapcsolo tablahoz felvesszuk */
-    for(let i= 0; i < allergens.length; i++){
+    for (let i = 0; i < allergens.length; i++) {
       this.db.recipe_Allergens.create({
-        data : {
-          allergen_id : allergens[i],
-          recipe_id : recipe.id
+        data: {
+          allergen_id: allergens[i],
+          recipe_id: recipe.id
         }
       })
     }
@@ -63,9 +63,9 @@ export class RecipesService {
     })
   }
 
-  findAllUser(id : number){
+  findAllUser(id: number) {
     return this.db.recipes.findMany({
-      where : {id}
+      where: { id }
     })
   }
 
@@ -86,7 +86,22 @@ export class RecipesService {
    * @param updateRecipeDto a modosítandó adatok 
    * @returns 
    */
-  update(id: number, updateRecipeDto: UpdateRecipeDto) {
+   async update(id: number, updateRecipeDto: UpdateRecipeDto) {
+    if (updateRecipeDto.allergens.length != 0) {
+      const results = await this.db.recipe_Allergens.findMany({
+        where: {
+          recipe_id: id
+        },
+        select: {
+          allergen_id: true
+        }
+      })
+      const currectAllergens = results.map(x => x.allergen_id)  
+      const remoreAllergens = updateRecipeDto.allergens.filter(x => currectAllergens.indexOf(x) < 0)
+      this.RemovedAllergens(updateRecipeDto.id, remoreAllergens)
+      const createAllergens = currectAllergens.filter(x => updateRecipeDto.allergens.indexOf(x) < 0)
+      this.CreateAllergens(updateRecipeDto.id, createAllergens)
+    }
     return this.db.recipes.update({
       where: { id },
       data: {
@@ -130,8 +145,8 @@ export class RecipesService {
       return this.db.$queryRaw`SELECT id, title, description, preptime, posted, AVG(ratings.rating) AS rating FROM recipes INNER JOIN recipe_allergens ON recipes.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON recipes.id = ratings.recipes_id WHERE title LIKE ${stringSql} OR recipes.description LIKE ${stringSql};`
     }
     /**ha van allergen = 1 */
-    if(array.length == 1){
-      return this.db.$queryRaw`SELECT id, title, description, preptime, posted, AVG(ratings.rating) AS rating FROM recipes INNER JOIN recipe_allergens ON recipes.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON recipes.id = ratings.recipes_id WHERE title LIKE ${stringSql} OR recipes.description LIKE ${stringSql} AND allergens.id NOT ${checkedArray[0]};` 
+    if (array.length == 1) {
+      return this.db.$queryRaw`SELECT id, title, description, preptime, posted, AVG(ratings.rating) AS rating FROM recipes INNER JOIN recipe_allergens ON recipes.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON recipes.id = ratings.recipes_id WHERE title LIKE ${stringSql} OR recipes.description LIKE ${stringSql} AND allergens.id NOT ${checkedArray[0]};`
     }
     /**mysql formatumhoz stringgé csináljuk az array */
     const arrayString: string = this.arrayToString(checkedArray)
@@ -169,4 +184,28 @@ export class RecipesService {
     string += ")"
     return string
   }
-}
+
+  RemovedAllergens(id: number, removedAllergens: number[]) {
+    this.db.recipe_Allergens.deleteMany({
+      where: {
+        allergen_id: {
+          in : removedAllergens
+        },
+        AND: {
+          recipe_id: id
+        }
+      }
+    })
+  }
+
+    CreateAllergens(id: number, createAllergens: number[]) {
+      createAllergens.forEach(element => {
+        this.db.recipe_Allergens.create({
+          data : {
+            allergen_id : element,
+            recipe_id : id
+          }
+        })
+      });
+    }
+  }

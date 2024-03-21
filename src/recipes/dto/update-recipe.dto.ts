@@ -24,6 +24,10 @@ export class UpdateRecipeDto extends PartialType(CreateRecipeDto) {
   @Optional()
   preptime?: number;
 
+  /**az uj allergen lista */
+  @Optional()
+  allergens? : number[]
+
   /**a frissitendő cím */
   @Optional()
   title?: string;
