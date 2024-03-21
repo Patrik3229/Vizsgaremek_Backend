@@ -30,7 +30,7 @@ async function seedAdmin() {
 }
 
 async function otherSeed() {
-    let allegenLenght
+    let allegenLenght = 0
     //allegens
     try {
         const response = await fetch("./allergens.json")
