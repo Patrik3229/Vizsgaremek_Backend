@@ -8,7 +8,7 @@
     <li>Fecske Márk
       <p><a href="">Mobil applikáció</a></p>
     </li>
-    <li><b>Elekes Fanni</b>
+    <li>Elekes Fanni
       <p><b>API</b> + <a href="https://github.com/EFanni05/Vizsgaremek_Asztali">Backen</a></p>
     </li>
 </ul><br>
