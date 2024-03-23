@@ -83,6 +83,12 @@ export class UsersService {
     })
   }
 
+  /**
+   * név szerinti keresés
+   * @param id user id adminé
+   * @param string keresendő szöveg
+   * @returns user vagy user tartalmazó lista
+   */
   searchAdmin(id: number, string : string) {
     return this.db.users.findMany({
       where: {
@@ -104,6 +110,7 @@ export class UsersService {
 
   /**
    * user listázó
+   * @param id user id
    * @returns minden létező user-t kivétel saját magát
    */
   findAll(id: number) {
@@ -121,7 +128,7 @@ export class UsersService {
 
   /**
    * user keresés
-   * @param id 
+   * @param id user id-ja
    * @returns 1 user
    */
   findOne(id: number) {
@@ -138,8 +145,8 @@ export class UsersService {
 
   /**
    * user frissítés
-   * @param id 
-   * @param updateUserDto 
+   * @param id user id-ja
+   * @param updateUserDto modosítandó adatok 
    * @returns a módosított adatok
    */
   async update(id: number, updateUserDto: UpdateUserDto) {
@@ -165,8 +172,8 @@ export class UsersService {
 
   /**
    * user frissítés admin
-   * @param id 
-   * @param updateUserDto 
+   * @param id user id-ja
+   * @param roleUpdate új role 
    * @returns a módosított adatok
    */
   updateRole(id: number, roleUpdate: roleUpdateDto) {

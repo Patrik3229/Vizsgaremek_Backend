@@ -32,7 +32,7 @@ export class UsersController {
 
   /**
    * Regisztrációra használt fügvény, a hash miatt async
-   * @param createUserDto 
+   * @param createUserDto új user adatai
    * @returns az adatbázisba bele teszi az új user-t
    */
   @Post('register')
@@ -53,10 +53,11 @@ export class UsersController {
   }
 
   /**
+   * ADMIN FUNCTION
    * minden user listázása
    * sima user nem tudja meghívni ezt
    * a 'GET' body üres
-   * @param req 
+   * @param req a request beköldő token kiolvasott id
    * @returns user lista
    */
   @Get('all')
@@ -74,7 +75,7 @@ export class UsersController {
   /**
    * egy specifikus user megkeresése
    * mivel ezt guest mode is el lehet érni ehhez nem kell token
-   * @param id 
+   * @param id user id-ja
    * @returns user adatokat
    */
   @Get('find:id')
@@ -82,6 +83,13 @@ export class UsersController {
     return this.usersService.findOne(+id);
   }
 
+  /**
+   * ADMIN FUNCTION
+   * név szerint user keresés
+   * @param string keresőben berírt szöveg
+   * @param req a request beköldő token kiolvasott id
+   * @returns egy olyan listát vagy user akivel egyezik a szöveg részletesen
+   */
   @Get('search:string')
   @UseGuards(AuthGuard('bearer'))
   AdminUserSearch(@Param('string') string : string,@Request() req) {
@@ -107,8 +115,10 @@ export class UsersController {
 
 
   /**
+   * ADMIN FUNCTION
    * egy user adatait tudja kitörölni rankot
    * @param id user id
+   * @param req a request beköldő token kiolvasott id
    * @returns kitöli az adatokat -> egyből ki jelenkezteti
    */
   @Patch('update-admin:id')
@@ -123,7 +133,7 @@ export class UsersController {
 
   /**
    * a belejelenkezett felhasználot kitörli
-   * @param id 
+   * @param id user id-ja
    * @returns kitörli a felhasználót
    */
   @Delete('delete-self:id')
@@ -137,9 +147,10 @@ export class UsersController {
   }
 
   /**
+   * ADMIN FUNCTION
    * admin/manager által bárki kitörlést
-   * @param id 
-   * @param req 
+   * @param id user id-ja
+   * @param req a request beköldő token kiolvasott id
    * @returns kitöröli a felhasználót
    */
   @Delete('delete:id')

@@ -12,7 +12,7 @@ export class RecipesController {
 
   /**
    * új receptet fügvény
-   * @param createRecipeDto 
+   * @param createRecipeDto a recept létrehozzásához tartozó adatok
    * @returns az adatbázisba új recept tesz bele
    */
   @Post('post')
@@ -22,8 +22,8 @@ export class RecipesController {
 
   /**
    * recept kereső
-   * @param searchText 
-   * @param selectedAllergens 
+   * @param searchText keresőben beírt szöveg KÖTELEZŐ
+   * @param selectedAllergens allergenek id álló lista NEM KÖTELEZŐ
    * @returns egy listát a megfelelő receptekről
    */
   @Get('searchContent')
@@ -31,6 +31,11 @@ export class RecipesController {
     return this.recipesService.searchConent(searchText, selectedAllergens)
   }
 
+  /**
+   * a saját recepteket kérdezi le
+   * @param req a token lekérdezett user 
+   * @returns receptekbő álló listát
+   */
   @Get('me:recipes')
   @UseGuards(AuthGuard('bearer'))
   meRecipes(@Request() req) {
@@ -49,7 +54,7 @@ export class RecipesController {
 
   /**
    * visszaad egy specifikus receptet
-   * @param id 
+   * @param id recept id-ja
    * @returns receptet
    */
   @Get('find:id')
@@ -57,6 +62,13 @@ export class RecipesController {
     return this.recipesService.findOne(+id);
   }
 
+  /**
+   * ADMIN FUNCTION
+   * egy user receptjeit adja vissza
+   * @param id user id-ja
+   * @param req a request beköldő token kiolvasott id
+   * @returns receptekből álló lista
+   */
   @Get('search-user:id')
   @UseGuards(AuthGuard('bearer'))
   NameSearch(@Param('id') id: string, @Request() req){
@@ -69,8 +81,8 @@ export class RecipesController {
 
   /**
    * egy specifikus receptet frissít
-   * @param id 
-   * @param updateRecipeDto 
+   * @param id recept id-ja
+   * @param updateRecipeDto frissítendő adatok  
    * @returns frissiti a receptet
    */
   @Patch('update:id')
@@ -80,10 +92,11 @@ export class RecipesController {
   }
 
   /**
+   * ADMIN FUNCTION
    * egy specifikus update-ja de mivel admin mindenkit tud
-   * @param id 
-   * @param updateRecipeDto 
-   * @param req 
+   * @param id recept id-ja
+   * @param updateRecipeDto  frissítendő adatok
+   * @param req a request beköldő token kiolvasott id
    * @returns frissiti a receptet
    */
   @Patch('update-admin:id')
@@ -98,7 +111,8 @@ export class RecipesController {
 
   /**
    * egy specifikus receptet kitörli
-   * @param id 
+   * @param id recept id
+   * @param reqa request beköldő token kiolvasott id
    * @returns kitörölt recept
    */
   @Delete('delete:id')
@@ -112,9 +126,10 @@ export class RecipesController {
   }
 
   /**
+   * ADMIN FUNCTION
    * egy specifikus kitörli de mivel admin mindenkiét tudja
-   * @param id 
-   * @param req 
+   * @param id recept id-ja
+   * @param req a request beköldő token kiolvasott id
    * @returns kitörölt recept
    */
   @Delete('delete-admin:id')

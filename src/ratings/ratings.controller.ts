@@ -12,7 +12,7 @@ export class RatingsController {
 
   /**
   * új rating csinál
-  * @param createRatingDto 
+  * @param createRatingDto új rating adatai
   * @returns új ratinget
   */
   @Post('post')
@@ -23,8 +23,9 @@ export class RatingsController {
   }
 
   /**
+   * ADMIN FUNCTION
    * egy receptehz az összes rating kilistázza
-   * @param id 
+   * @param id id-ja
    * @returns rating tömböt
    */
   @Get('getAll')
@@ -40,7 +41,7 @@ export class RatingsController {
 
   /**
    * egy specifikus rating add vissza
-   * @param id 
+   * @param id rating id-ja
    * @returns a specifikus ratinget
    */
   @Get('find:id')
@@ -50,7 +51,7 @@ export class RatingsController {
 
   /**
    * vissza adja a bejelnekezett user ratingjeit
-   * @param req 
+   * @param req a request beköldő token kiolvasott id
    * @returns az összes user ratingjét
    */
   @Get('me:rating')
@@ -62,9 +63,9 @@ export class RatingsController {
 
   /**
    * user saját ratingjét frissitő function
-   * @param req 
-   * @param updateRatingDto 
-   * @returns 
+   * @param req a request beköldő token kiolvasott id
+   * @param updateRatingDto frissítendő adatok tartalmazza
+   * @returns modosított rating
    */
   @Patch('update')
   @UseGuards(AuthGuard('bearer'))
@@ -73,11 +74,12 @@ export class RatingsController {
   }
 
   /**
+   * ADMIN FUNCTION
    * admin rating update
-   * @param req 
+   * @param req a request beköldő token kiolvasott id
    * @param updateRatingDto 
-   * @param id 
-   * @returns 
+   * @param id rating id
+   * @returns modosított rating
    */
   @Patch('updateAdmin:id')
   @UseGuards(AuthGuard('bearer'))
@@ -92,8 +94,8 @@ export class RatingsController {
 
   /**
    * user által törlés
-   * @param req 
-   * @returns 
+   * @param req a request beköldő token kiolvasott id
+   * @returns kitörölt rating
    */
   @Delete('delete')
   @UseGuards(AuthGuard('bearer'))
@@ -103,10 +105,11 @@ export class RatingsController {
   }
 
   /**
+   * ADMIN FUNCTION
    * admin által kitörlés
-   * @param req 
-   * @param id 
-   * @returns 
+   * @param req a request beköldő token kiolvasott id
+   * @param id rating id
+   * @returns kitörölt rating
    */
   @Delete('deleteadmin:id')
   @UseGuards(AuthGuard('bearer'))

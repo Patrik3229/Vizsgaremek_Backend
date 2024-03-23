@@ -49,7 +49,7 @@ export class RecipesService {
 
   /**
    * saját recepteket kereső
-   * @param id 
+   * @param id user id-ja
    * @returns kikeresi az összes receptet ami a felhasználóé
    */
   findMine(id: number) {
@@ -63,6 +63,11 @@ export class RecipesService {
     })
   }
 
+  /**
+   * 1 user összes receptjét adja vissza
+   * @param id user id-ja
+   * @returns egy recepteket tartalamzó listát
+   */
   findAllUser(id: number) {
     return this.db.recipes.findMany({
       where: { id }
@@ -84,9 +89,10 @@ export class RecipesService {
    * recept frissítő
    * @param id a recept id-ja
    * @param updateRecipeDto a modosítandó adatok 
-   * @returns 
+   * @returns updated receptel
    */
    async update(id: number, updateRecipeDto: UpdateRecipeDto) {
+    /**a kapcsoló tábla frisítése, add + delete */
     if (updateRecipeDto.allergens.length != 0) {
       const results = await this.db.recipe_Allergens.findMany({
         where: {
@@ -108,7 +114,7 @@ export class RecipesService {
         title: updateRecipeDto.title,
         description: updateRecipeDto.description,
         content: updateRecipeDto.content,
-        //the time will be reset to now
+        /**Az időt mindig amikor lefut az update kicseréljük */
         posted: Date.now().toString(),
         preptime: updateRecipeDto.preptime
       }
@@ -117,7 +123,7 @@ export class RecipesService {
 
   /**
    * receptet töröl ki
-   * @param id 
+   * @param id a recept id-ja
    * @returns kitörölt recept
    */
   remove(id: number) {
@@ -156,7 +162,7 @@ export class RecipesService {
 
   /**
    * tönb ellenörző
-   * @param array 
+   * @param array allergen listája
    * @returns ugyanazt az any array de az ellenörőn átment
    */
   arrayChecker(array: any[]) {
@@ -170,7 +176,7 @@ export class RecipesService {
 
   /**
    * mysql not in kellően string converter
-   * @param array 
+   * @param array allergen listája
    * @returns a helyes megformázott string
    */
   arrayToString(array: number[]) {

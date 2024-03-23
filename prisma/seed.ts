@@ -26,28 +26,28 @@ async function seedAdmin() {
             role: "manager"
         }
     })
-    otherSeed() //for testing
-    //AllergensFinalSeed() //for final ver
+    otherSeed() /**modosított rating */
+    //AllergensFinalSeed() /**modosított rating */
 }
 
 async function otherSeed() {
     let allegenLenght = 0
-    //allegens
+    /**allergens */
     try {
         const response = await fetch("./allergens.json")
         const x = await response.json() as Allergen[]
         allegenLenght = x.length
         for (let i = 0; i < x.length; i++) {
             prisma.allergens.create({
-                data : {
-                    name : x[i].name
+                data: {
+                    name: x[i].name
                 }
             })
         }
     } catch {
         console.log('hiba a allergens-el')
     }
-    //conection table
+    /**conection table*/
     if (allegenLenght != 0) {
         for (let i = 0; i < 20; i++) {
             prisma.recipe_Allergens.create({
@@ -58,7 +58,7 @@ async function otherSeed() {
             })
         }
     }
-    //recipes
+    /**recipes */
     for (let i = 0; i < 10; i++) {
         prisma.recipes.create({
             data: {
@@ -70,7 +70,7 @@ async function otherSeed() {
             }
         })
     }
-    //ratings
+    /**ratings*/
     for (let i = 10; i < 11; i++) {
         prisma.ratings.create({
             data: {
@@ -83,19 +83,22 @@ async function otherSeed() {
     }
 }
 
-async function AllergensFinalSeed(){
-try {
-    const response = await fetch("./allergens.json")
-    const x = await response.json() as Allergen[]
-    for (let i = 0; i < x.length; i++) {
-        prisma.allergens.create({
-            data : {
-                name : x[i].name
-            }
-        })
+/**
+ * allergen seed a final-hoz
+ */
+async function AllergensFinalSeed() {
+    try {
+        const response = await fetch("./allergens.json")
+        const x = await response.json() as Allergen[]
+        for (let i = 0; i < x.length; i++) {
+            prisma.allergens.create({
+                data: {
+                    name: x[i].name
+                }
+            })
+        }
+    } catch {
+        console.log('hiba a allergens-el')
     }
-} catch {
-    console.log('hiba a allergens-el')
-}
 }
 seedAdmin()

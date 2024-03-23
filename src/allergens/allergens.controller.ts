@@ -24,6 +24,11 @@ export class AllergensController {
     return this.allergensService.findOne(+id);
   }
 
+  /**
+   * egy recepthez tartozó allergének megkeresée
+   * @param id receőt id-ja
+   * @returns allergen nevéből álló listát
+   */
   @Get('find-recipe:id')
   findrecipe(@Param('id') id:string){
     return this.allergensService.findRecipeAllergen(+id);
