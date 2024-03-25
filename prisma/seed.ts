@@ -67,14 +67,11 @@ async function otherSeed() {
                 }
             })
         }
-    }
-    /**ratings*/
-    for (let i = 10; i < 11; i++) {
-        const x = await prisma.ratings.create({
+        const y = await prisma.ratings.create({
             data: {
                 content: faker.lorem.text(),
                 user_id: 1,  //this for the default admin
-                recipe_id: faker.number.int({ min: 1, max: 10 }),
+                recipe_id: x.id,
                 rating: faker.number.int({ min: 1, max: 5 })
             }
         })
