@@ -86,17 +86,17 @@ async function otherSeed() {
  */
 async function AllergensFinalSeed() {
     try {
-        const response = await fetch("./allergens.json")
-        const x = await response.json() as Allergen[]
+        const response = await fs.readFile("./prisma/allergens.json", "utf8")
+        const x = JSON.parse(response) as Allergen[]
         for (let i = 0; i < x.length; i++) {
-            prisma.allergens.create({
+            const y = await prisma.allergens.create({
                 data: {
                     name: x[i].name
                 }
             })
         }
-    } catch {
-        console.log('hiba a allergens-el')
+    } catch (e) {
+        console.log(e)
     }
 }
 seedAdmin()
