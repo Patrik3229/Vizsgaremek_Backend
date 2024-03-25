@@ -145,11 +145,11 @@ export class RecipesService {
     }
     const stringSql = `'%${string}%'`
     /**megnézzük hogy a tömb csak szamokat tartalmazz */
-    const checkedArray: number[] = this.arrayChecker(array)
     /**ha nincs allergen */
     if (array.length == 0) {
       return this.db.$queryRaw`SELECT id, title, description, preptime, posted, AVG(ratings.rating) AS rating FROM recipes INNER JOIN recipe_allergens ON recipes.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON recipes.id = ratings.recipes_id WHERE title LIKE ${stringSql} OR recipes.description LIKE ${stringSql};`
     }
+    const checkedArray: number[] = this.arrayChecker(array)
     /**ha van allergen = 1 */
     if (array.length == 1) {
       return this.db.$queryRaw`SELECT id, title, description, preptime, posted, AVG(ratings.rating) AS rating FROM recipes INNER JOIN recipe_allergens ON recipes.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON recipes.id = ratings.recipes_id WHERE title LIKE ${stringSql} OR recipes.description LIKE ${stringSql} AND allergens.id NOT ${checkedArray[0]};`
