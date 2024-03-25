@@ -1,9 +1,9 @@
 import { PrismaClient } from "@prisma/client"
 const prisma = new PrismaClient()
 import * as argon2 from "argon2";
-import { fa, faker } from '@faker-js/faker';
+import { faker } from '@faker-js/faker';
 import { Allergen } from "./allergens";
-import fs from 'fs/promises'
+import {promises as fs} from 'fs'
 /**
  * jelszót titkosít
  * @param pass 
@@ -27,7 +27,7 @@ async function seedAdmin() {
             role: "manager"
         }
     })
-    otherSeed() /**modosított rating */
+    await otherSeed() /**modosított rating */
     //AllergensFinalSeed() /**modosított rating */
 }
 
@@ -35,7 +35,7 @@ async function otherSeed() {
     let allegenLenght = 0
     /**allergens */
     try {
-        const response = await fs.readFile("./allergens.json", 'utf8')
+        const response = await fs.readFile("./prisma/allergens.json", "utf8")
         const x = JSON.parse(response) as Allergen[]
         allegenLenght = x.length
         for (let i = 0; i < x.length; i++) {
@@ -45,11 +45,10 @@ async function otherSeed() {
                 }
             })
         }
-    } catch {
-        console.log('hiba a allergens-el')
+    } catch(e) {
+        console.log(e)
     }
     /**conection table*/
-    /*
     if (allegenLenght != 0) {
         for (let i = 0; i < 20; i++) {
             const x = await prisma.recipe_Allergens.create({
@@ -59,7 +58,7 @@ async function otherSeed() {
                 }
             })
         }
-    }*/
+    }
     /**recipes */
     /*for (let i = 0; i < 10; i++) {
         const x = await prisma.recipes.create({

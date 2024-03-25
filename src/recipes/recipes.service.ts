@@ -3,10 +3,11 @@ import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
 import { PrismaService } from 'src/prisma.service';
 import { AllergensService } from 'src/allergens/allergens.service';
+import { RecipesAllergensService } from 'src/recipes_allergens/recipes_allergens.service';
 
 @Injectable()
 export class RecipesService {
-  constructor(private readonly db: PrismaService, private readonly allergen: AllergensService) { }
+  constructor(private readonly db: PrismaService, private readonly allergen: AllergensService, private readonly connectTable : RecipesAllergensService) { }
 
   /**
    * új recept poszt csinál
@@ -27,12 +28,7 @@ export class RecipesService {
     })
     /**a kapcsolo tablahoz felvesszuk */
     for (let i = 0; i < allergens.length; i++) {
-      this.db.recipe_Allergens.create({
-        data: {
-          allergen_id: allergens[i],
-          recipe_id: recipe.id
-        }
-      })
+      this.connectTable.create(recipe.id, allergens[i])
     }
     return recipe
   }
