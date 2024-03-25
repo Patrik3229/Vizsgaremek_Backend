@@ -193,16 +193,7 @@ export class RecipesService {
    * @param removedAllergens kitörölendő id-k
    */
   RemovedAllergens(id: number, removedAllergens: number[]) {
-    this.db.recipe_Allergens.deleteMany({
-      where: {
-        allergen_id: {
-          in : removedAllergens
-        },
-        AND: {
-          recipe_id: id
-        }
-      }
-    })
+    this.connectTable.delete(id, removedAllergens)
   }
 
   /**
@@ -212,12 +203,7 @@ export class RecipesService {
    */
   CreateAllergens(id: number, createAllergens: number[]) {
     createAllergens.forEach(element => {
-      this.db.recipe_Allergens.create({
-        data : {
-          allergen_id : element,
-          recipe_id : id
-        }
-      })
+      this.connectTable.create(id, element)
     });
   }
   }

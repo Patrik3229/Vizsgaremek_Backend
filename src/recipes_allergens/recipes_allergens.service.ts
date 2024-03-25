@@ -13,4 +13,17 @@ export class RecipesAllergensService {
             }
         })
     }
+
+    delete(recipe : number, allergens : number[]){
+        this.db.recipe_Allergens.deleteMany({
+            where: {
+                allergen_id: {
+                  in : allergens
+                },
+                AND: {
+                  recipe_id: recipe
+                }
+              }
+        })
+    }
 }
