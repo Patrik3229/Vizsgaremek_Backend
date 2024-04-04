@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Post, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Body, Controller, HttpException, HttpStatus, Post, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { UsersService } from 'src/users/users.service';
@@ -22,11 +22,11 @@ export class AuthController {
     const user = await this.usersService.findByEmail(loginDto.email);
     /**ha nem létezik user */
     if (user == null) {
-      throw new BadRequestException('Hibás email vagy jelszó!');
+      throw new UnauthorizedException('Hibás email vagy jelszó!');
     }
     /**ha a jelszó nem jó */
     if (!await verify(user.password, loginDto.password)) {
-      throw new BadRequestException('Hibás email vagy jelszó!');
+      throw new UnauthorizedException('Hibás email vagy jelszó!');
     }
     /**ha minden helyes */
     return {

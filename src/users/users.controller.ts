@@ -25,6 +25,7 @@ export class UsersController {
   me(@Request() req) {
     const user: Users = req.user;
     return {
+      id : user.id,
       email: user.email,
       name: user.name,
       role: user.role,
@@ -110,6 +111,7 @@ export class UsersController {
   @Patch('update:id')
   @UseGuards(AuthGuard('bearer'))
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @Request() req) {
+    console.log("***UserUpdate: " + updateUserDto["username"])
     const user: Users = req.user
     if (user.id != parseInt(id)) {
       throw new ForbiddenException(`You don't have premissoin to do this`)

@@ -179,10 +179,10 @@ export class UsersService {
     let update
     if(updateUserDto.password != null && updateUserDto.passwordAgain != null && updateUserDto.passwordOld != null){
       if (updateUserDto.password != updateUserDto.passwordAgain) {
-        throw new BadRequestException(`The passwords doesn't match`)
+        throw new BadRequestException(`The passwords don't match`)
       }
       if ((updateUserDto.password == updateUserDto.passwordOld) && (updateUserDto.passwordAgain == updateUserDto.passwordOld)) {
-        throw new BadRequestException('The passowrd is the same as the previous')
+        throw new BadRequestException('The new password is same as the previous')
       }
       update = await this.db.users.update({
         where: { id },
@@ -198,6 +198,7 @@ export class UsersService {
         }
       })
     }
+    console.log("password nelkul***** " + JSON.stringify(updateUserDto))
     if(updateUserDto.username != null){
       update = await this.db.users.update({
         where : {id},
