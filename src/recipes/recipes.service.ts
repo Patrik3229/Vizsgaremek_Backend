@@ -14,22 +14,24 @@ export class RecipesService {
    * @param createRecipeDto a user altal bekuldott adatok, a body talalhato adatok
    * @returns új receptet ad vissza
    */
-  async create(createRecipeDto: CreateRecipeDto) {
-    const allergens = createRecipeDto.allergens
+  async create(id : number, createRecipeDto: CreateRecipeDto) {
+    const chechedAllergens : number[] = this.arrayChecker(createRecipeDto.allergens)
     const recipe = await this.db.recipes.create({
       data: {
         title: createRecipeDto.title,
         description: createRecipeDto.description,
         content: createRecipeDto.content,
-        user_id: createRecipeDto.user_id,
-        posted: createRecipeDto.posted,
+        user_id: id,
         preptime: createRecipeDto.preptime
       }
     })
     /**a kapcsolo tablahoz felvesszuk */
-    for (let i = 0; i < allergens.length; i++) {
-      this.connectTable.create(recipe.id, allergens[i])
-    }
+    await this.db.recipe_Allergens.createMany({
+      data : chechedAllergens.map(a => ({
+        allergen_id : a,
+        recipe_id: recipe.id
+      }))
+    })
     return recipe
   }
 
@@ -37,8 +39,8 @@ export class RecipesService {
    * kilistázza az összes receptet
    * @returns listát a receptekről 5 hosszúságú
    */
-  findAll() {
-    return this.db.recipes.findMany({
+  async findAll() {
+    return await this.db.recipes.findMany({
       take: 5
     })
   }
@@ -48,12 +50,18 @@ export class RecipesService {
    * @param id user id-ja
    * @returns kikeresi az összes receptet ami a felhasználóé
    */
-  findMine(id: number) {
-    return this.db.recipes.findMany({
+  async findMine(id: number) {
+    return await this.db.recipes.findMany({
       where: {
         user_id: id
       },
       select: {
+        id : true,
+        description: true,
+        title : true,
+        user_id : true,
+        posted : true,
+        preptime : false,
         content: false
       }
     })
@@ -64,8 +72,8 @@ export class RecipesService {
    * @param id user id-ja
    * @returns egy recepteket tartalamzó listát
    */
-  findAllUser(id: number) {
-    return this.db.recipes.findMany({
+  async findAllUser(id: number) {
+    return await this.db.recipes.findMany({
       where: { id }
     })
   }
@@ -75,8 +83,8 @@ export class RecipesService {
    * @param id a recetp id amit meg akarunk keresni
    * @returns a kersett recept adatai
    */
-  findOne(id: number) {
-    return this.db.recipes.findUnique({
+  async findOne(id: number) {
+    return await this.db.recipes.findUnique({
       where: { id }
     })
   }
@@ -89,7 +97,7 @@ export class RecipesService {
    */
    async update(id: number, updateRecipeDto: UpdateRecipeDto) {
     /**a kapcsoló tábla frisítése, add + delete */
-    if (updateRecipeDto.allergens.length != 0) {
+    if (updateRecipeDto.allergens != null && updateRecipeDto.allergens.length != 0) {
       const results = await this.db.recipe_Allergens.findMany({
         where: {
           recipe_id: id
@@ -104,14 +112,14 @@ export class RecipesService {
       const createAllergens = currectAllergens.filter(x => updateRecipeDto.allergens.indexOf(x) < 0)
       this.CreateAllergens(updateRecipeDto.id, createAllergens)
     }
-    return this.db.recipes.update({
+    return await this.db.recipes.update({
       where: { id },
       data: {
         title: updateRecipeDto.title,
         description: updateRecipeDto.description,
         content: updateRecipeDto.content,
         /**Az időt mindig amikor lefut az update kicseréljük */
-        posted: Date.now().toString(),
+        posted: new Date().toISOString(),
         preptime: updateRecipeDto.preptime
       }
     })
@@ -157,7 +165,7 @@ export class RecipesService {
   }
 
   /**
-   * tönb ellenörző
+   * tömb ellenörző
    * @param array allergen listája
    * @returns ugyanazt az any array de az ellenörőn átment
    */
@@ -206,4 +214,4 @@ export class RecipesService {
       this.connectTable.create(id, element)
     });
   }
-  }
+}

@@ -30,7 +30,7 @@ model Recipes {
   user        Users              @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   user_id     Int
   rating      Ratings[]
-  connect     Recipe_Allergens[]
+  allergens   Recipe_Allergens[]
 }
 
 model Ratings {
@@ -47,7 +47,7 @@ model Ratings {
 model Allergens {
   id      Int                @id @default(autoincrement())
   name    String             @db.VarChar(20)
-  connect Recipe_Allergens[]
+  recipes Recipe_Allergens[]
 }
 
 model Recipe_Allergens {

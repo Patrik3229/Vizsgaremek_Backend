@@ -3,7 +3,7 @@ import { RatingsService } from './ratings.service';
 import { CreateRatingDto } from './dto/create-rating.dto';
 import { UpdateRatingDto } from './dto/update-rating.dto';
 import { AuthGuard } from '@nestjs/passport/dist';
-import { Ratings, Users } from '@prisma/client';
+import { Users } from '@prisma/client';
 import { UsersService } from 'src/users/users.service';
 
 @Controller('ratings')
@@ -31,9 +31,8 @@ export class RatingsController {
   @Get('getAll')
   @UseGuards(AuthGuard('bearer'))
   async findAll(@Request() req) {
-    const rating: Ratings = req.rating
-    const role = await this.user.getRole(rating.user_id)
-    if (role != "manager" && role != "admin") {
+    const users: Users = req.user
+    if (users.role != "manager" && users.role != "admin") {
       throw new UnauthorizedException("You dont have premmision for it")
     }
     return this.ratingsService.findAll();
@@ -84,9 +83,8 @@ export class RatingsController {
   @Patch('updateAdmin:id')
   @UseGuards(AuthGuard('bearer'))
   async updateAdmin(@Request() req, @Body() updateRatingDto: UpdateRatingDto,@Param('id') id: string) {
-    const rating: Ratings = req.rating
-    const role = await this.user.getRole(rating.user_id)
-    if (role != "manager" && role != "admin") {
+    const users: Users = req.user
+    if (users.role != "manager" && users.role != "admin") {
       throw new UnauthorizedException("You dont have premmision for it")
     }
     return this.ratingsService.update(+id, updateRatingDto);
@@ -97,11 +95,10 @@ export class RatingsController {
    * @param req a request beköldő token kiolvasott id
    * @returns kitörölt rating
    */
-  @Delete('delete')
+  @Delete('delete:id')
   @UseGuards(AuthGuard('bearer'))
-  remove(@Request() req) {
-    const rating: Ratings = req.rating
-    return this.ratingsService.remove(rating.id);
+  remove(@Request() req, @Param('id') id : number) {
+    return this.ratingsService.remove(+id);
   }
 
   /**
@@ -113,10 +110,9 @@ export class RatingsController {
    */
   @Delete('deleteadmin:id')
   @UseGuards(AuthGuard('bearer'))
-  async removeAdmin(@Request() req,@Param('id') id: number) {
-    const rating: Ratings = req.rating
-    const role = await this.user.getRole(rating.user_id)
-    if (role != "manager" && role != "admin") {
+  async removeAdmin(@Request() req, @Param('id') id: number) {
+    const users: Users = req.user
+    if (users.role != "manager" && users.role != "admin") {
       throw new UnauthorizedException("You dont have premmision for it")
     }
     return this.ratingsService.remove(id);

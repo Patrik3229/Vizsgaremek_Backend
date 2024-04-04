@@ -5,8 +5,8 @@ import { PrismaService } from 'src/prisma.service';
 export class RecipesAllergensService {
     constructor(private readonly db : PrismaService){}
 
-    create(recipe : number, allergen : number){
-        this.db.recipe_Allergens.create({
+    async create(recipe : number, allergen : number){
+        await this.db.recipe_Allergens.create({
             data : {
                 allergen_id : allergen,
                 recipe_id : recipe

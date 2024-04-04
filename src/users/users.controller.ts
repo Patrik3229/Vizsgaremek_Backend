@@ -5,6 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Users } from '@prisma/client';
 import { AuthGuard } from '@nestjs/passport';
 import { roleUpdateDto } from './dto/role-update.dto';
+import { UpdateAdminDto } from './dto/update-admin.dto';
 
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/
 
@@ -108,8 +109,11 @@ export class UsersController {
    */
   @Patch('update:id')
   @UseGuards(AuthGuard('bearer'))
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    //TODO new password hash
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @Request() req) {
+    const user: Users = req.user
+    if (user.id != parseInt(id)) {
+      throw new ForbiddenException(`You don't have premissoin to do this`)
+    }
     return this.usersService.update(+id, updateUserDto);
   }
 
@@ -121,7 +125,7 @@ export class UsersController {
    * @param req a request beköldő token kiolvasott id
    * @returns kitöli az adatokat -> egyből ki jelenkezteti
    */
-  @Patch('update-admin:id')
+  @Patch('update-admin-role:id')
   @UseGuards(AuthGuard('bearer'))
   updateRole(@Param('id') id: string, @Body() role: roleUpdateDto, @Request() req) {
     const user: Users = req.user;
@@ -129,6 +133,23 @@ export class UsersController {
       throw new ForbiddenException();
     }
     return this.usersService.updateRole(+id, role);
+  }
+
+  /**
+   * ADMIN FUNCTION
+   * egy user adatait tudja kitörölni rankot
+   * @param id user id
+   * @param req a request beköldő token kiolvasott id
+   * @returns kitöli az adatokat -> egyből ki jelenkezteti
+   */
+  @Patch('update-admin:id')
+  @UseGuards(AuthGuard('bearer'))
+  updateUser(@Param('id') id: string, @Body() update: UpdateAdminDto, @Request() req) {
+    const user: Users = req.user;
+    if (user.role != 'manager' && user.role != 'admin') {
+      throw new ForbiddenException();
+    }
+    return this.usersService.updateAdmin(+id, update);
   }
 
   /**

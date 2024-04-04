@@ -1,4 +1,4 @@
-import { IsDateString, IsEmpty, IsInt, IsNotEmpty, IsNumber, IsString, MaxLength, Min } from "class-validator";
+import { IsArray, IsDateString, IsEmpty, IsInt, IsNotEmpty, IsNumber, IsString, MaxLength, Min } from "class-validator";
 
 /**
  * recipes dto, create
@@ -27,17 +27,15 @@ export class CreateRecipeDto {
   preptime: number
 
   /**timestamp arról hogy mikor postolták a receptet */
-  @IsDateString()
   @IsEmpty()
   posted: string
 
   /**postoló id-ja */
-  @IsInt()
-  @IsNotEmpty()
+  @IsEmpty()
   user_id: number
 
   /**a recepthez tartozo allergen id-ja */
   @IsNotEmpty()
-  @IsNumber()
+  @IsArray()
   allergens: number[]
 }

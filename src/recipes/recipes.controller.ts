@@ -4,7 +4,6 @@ import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { Users } from '@prisma/client';
-import { UsersService } from 'src/users/users.service';
 
 @Controller('recipes')
 export class RecipesController {
@@ -16,8 +15,10 @@ export class RecipesController {
    * @returns az adatbázisba új recept tesz bele
    */
   @Post('post')
-  create(@Body() createRecipeDto: CreateRecipeDto) {
-    return this.recipesService.create(createRecipeDto);
+  @UseGuards(AuthGuard('bearer'))
+  create(@Body() createRecipeDto: CreateRecipeDto, @Request() req) {
+    const user: Users = req.user
+    return this.recipesService.create(user.id ,createRecipeDto);
   }
 
   /**
