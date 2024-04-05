@@ -35,7 +35,7 @@ export class UsersService {
         email: false,
         id: false,
         name: false,
-        role : true
+        role: true
       }
     })
   }
@@ -54,10 +54,10 @@ export class UsersService {
         }
       },
       select: {
-        id : true,
-        email : true,
-        name : true,
-        role : true,
+        id: true,
+        email: true,
+        name: true,
+        role: true,
         password: false
       }
     })
@@ -89,10 +89,10 @@ export class UsersService {
         role: 'user'
       },
       select: {
-        id : true,
-        email : true,
-        name : true,
-        role : true,
+        id: true,
+        email: true,
+        name: true,
+        role: true,
         password: false
       }
     })
@@ -110,18 +110,24 @@ export class UsersService {
         NOT: {
           id: id
         },
-        name: {
-          contains: string
-        },
-        email: {
-          contains: string
-        }
+        OR: [
+          {
+            name: {
+              contains: string
+            }
+          },
+          {
+            email: {
+              contains: string
+            }
+          }
+        ]
       },
       select: {
-        id : true,
-        email : true,
-        name : true,
-        role : true,
+        id: true,
+        email: true,
+        name: true,
+        role: true,
         password: false
       }
     })
@@ -136,14 +142,14 @@ export class UsersService {
     return await this.db.users.findMany({
       where: {
         NOT: {
-          id : id
+          id: id
         }
       },
       select: {
-        id : true,
-        email : true,
-        name : true,
-        role : true,
+        id: true,
+        email: true,
+        name: true,
+        role: true,
         password: false
       }
     });
@@ -159,10 +165,10 @@ export class UsersService {
     return await this.db.users.findUnique({
       where: { id },
       select: {
-        id : true,
-        email : true,
-        name : true,
-        role : true,
+        id: true,
+        email: true,
+        name: true,
+        role: true,
         password: false
       }
     });
@@ -177,7 +183,7 @@ export class UsersService {
    */
   async update(id: number, updateUserDto: UpdateUserDto) {
     let update
-    if(updateUserDto.password != null && updateUserDto.passwordAgain != null && updateUserDto.passwordOld != null){
+    if (updateUserDto.password != null && updateUserDto.passwordAgain != null && updateUserDto.passwordOld != null) {
       if (updateUserDto.password != updateUserDto.passwordAgain) {
         throw new BadRequestException(`The passwords don't match`)
       }
@@ -190,41 +196,41 @@ export class UsersService {
           password: await this.passwordHash(updateUserDto.password),
         },
         select: {
-          id : true,
-          email : true,
-          name : true,
-          role : true,
+          id: true,
+          email: true,
+          name: true,
+          role: true,
           password: false
         }
       })
     }
     console.log("password nelkul***** " + JSON.stringify(updateUserDto))
-    if(updateUserDto.username != null){
+    if (updateUserDto.username != null) {
       update = await this.db.users.update({
-        where : {id},
-        data : {
-          name : updateUserDto.username
+        where: { id },
+        data: {
+          name: updateUserDto.username
         },
         select: {
-          id : true,
-          email : true,
-          name : true,
-          role : true,
+          id: true,
+          email: true,
+          name: true,
+          role: true,
           password: false
         }
       })
     }
-    if(updateUserDto.email != null){
+    if (updateUserDto.email != null) {
       update = await this.db.users.update({
-        where : {id},
-        data :{
-          email : updateUserDto.email
+        where: { id },
+        data: {
+          email: updateUserDto.email
         },
         select: {
-          id : true,
-          email : true,
-          name : true,
-          role : true,
+          id: true,
+          email: true,
+          name: true,
+          role: true,
           password: false
         }
       })
@@ -234,50 +240,56 @@ export class UsersService {
 
   async updateAdmin(id: number, updateUserDto: UpdateAdminDto) {
     let update
-    if(updateUserDto.email != null){
+    if (updateUserDto.email != null) {
       update = await this.db.users.update({
         where: { id },
-      data: {
-        email: updateUserDto.email
-      },
-      select: {
-        id : true,
-        email : true,
-        name : true,
-        role : true,
-        password: false
-      }
+        data: {
+          email: updateUserDto.email
+        },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          password: false
+        }
       })
     }
-    if(updateUserDto.password != null){
+    if (updateUserDto.password != null) {
       update = await this.db.users.update({
         where: { id },
-      data: {
-        password : await this.passwordHash(updateUserDto.password)
-      },
-      select: {
-        id : true,
-        email : true,
-        name : true,
-        role : true,
-        password: false
-      }
+        data: {
+          password: await this.passwordHash(updateUserDto.password)
+        },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          password: false
+        }
       })
     }
-    if(updateUserDto.username != null){
+    if (updateUserDto.username != null) {
       update = await this.db.users.update({
         where: { id },
-      data: {
-        name : updateUserDto.username
-      },
-      select: {
-        id : true,
-        email : true,
-        name : true,
-        role : true,
-        password: false
-      }
+        data: {
+          name: updateUserDto.username
+        },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          password: false
+        }
       })
+      if (updateUserDto.role != null) {
+        const role = await this.getRole(id)
+        if (role.role == "manager") {
+          update = await this.updateRole(id, updateUserDto.role)
+        }
+      }
     }
     return update
   }
@@ -288,17 +300,17 @@ export class UsersService {
    * @param roleUpdate új role 
    * @returns a módosított adatok
    */
-  async updateRole(id: number, roleUpdate: roleUpdateDto) {
+  async updateRole(id: number, role: string) {
     return await this.db.users.update({
       where: { id },
       data: {
-        role: roleUpdate.role
+        role: role
       },
       select: {
-        id : true,
-        email : true,
-        name : true,
-        role : true,
+        id: true,
+        email: true,
+        name: true,
+        role: true,
         password: false
       }
     })
@@ -314,10 +326,10 @@ export class UsersService {
     return this.db.users.delete({
       where: { id },
       select: {
-        id : true,
-        email : true,
-        name : true,
-        role : true,
+        id: true,
+        email: true,
+        name: true,
+        role: true,
         password: false
       }
     })

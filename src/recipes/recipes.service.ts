@@ -40,9 +40,7 @@ export class RecipesService {
    * @returns listát a receptekről 5 hosszúságú
    */
   async findAll() {
-    return await this.db.recipes.findMany({
-      take: 5
-    })
+    return await this.db.$queryRaw`SELECT r.id,r.title,r.description,r.content,r.preptime,r.posted, r.user_id,users.name as 'username' FROM recipes AS R INNER JOIN users ON r.user_id = users.id`
   }
 
   /**
@@ -51,20 +49,7 @@ export class RecipesService {
    * @returns kikeresi az összes receptet ami a felhasználóé
    */
   async findMine(id: number) {
-    return await this.db.recipes.findMany({
-      where: {
-        user_id: id
-      },
-      select: {
-        id : true,
-        description: true,
-        title : true,
-        user_id : true,
-        posted : true,
-        preptime : false,
-        content: false
-      }
-    })
+    return await this.db.$queryRaw`SELECT r.id,r.title,r.description,r.content,r.preptime,r.posted, r.user_id,users.name as 'username' FROM recipes AS R INNER JOIN users ON r.user_id = users.id WHERE r.user_id = ${id}`
   }
 
   /**
@@ -73,9 +58,7 @@ export class RecipesService {
    * @returns egy recepteket tartalamzó listát
    */
   async findAllUser(id: number) {
-    return await this.db.recipes.findMany({
-      where: { id }
-    })
+    return await this.db.$queryRaw`SELECT r.id,r.title,r.description,r.content,r.preptime,r.posted, r.user_id,users.name as 'username' FROM recipes AS R INNER JOIN users ON r.user_id = users.id WHERE r.user_id = ${id}`
   }
 
   /**
