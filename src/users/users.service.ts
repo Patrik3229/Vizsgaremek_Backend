@@ -204,7 +204,6 @@ export class UsersService {
         }
       })
     }
-    console.log("password nelkul***** " + JSON.stringify(updateUserDto))
     if (updateUserDto.username != null) {
       update = await this.db.users.update({
         where: { id },
@@ -285,10 +284,7 @@ export class UsersService {
         }
       })
       if (updateUserDto.role != null) {
-        const role = await this.getRole(id)
-        if (role.role == "manager") {
-          update = await this.updateRole(id, updateUserDto.role)
-        }
+        update = await this.updateRole(id, updateUserDto.role)
       }
     }
     return update

@@ -1,7 +1,7 @@
 import { PartialType } from "@nestjs/mapped-types";
 import { CreateUserDto } from "./create-user.dto";
 import { Optional } from "@nestjs/common";
-import { IsNotEmpty, IsNumber } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString } from "class-validator";
 /**
  * Az update Adminhoz használt dto
  */
@@ -21,4 +21,8 @@ export class UpdateAdminDto extends PartialType(CreateUserDto){
     @IsNotEmpty()
     @IsNumber()
     id : number
+
+    @IsNotEmpty()
+    @IsString()
+    role: string;
 }

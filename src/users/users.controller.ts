@@ -110,7 +110,7 @@ export class UsersController {
   @Patch('update:id')
   @UseGuards(AuthGuard('bearer'))
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @Request() req) {
-    console.log("***UserUpdate: " + updateUserDto["username"])
+    console.log("***UserUpdate: " + id)
     const user: Users = req.user
     if (user.id != parseInt(id)) {
       throw new ForbiddenException(`You don't have premissoin to do this`)
@@ -143,14 +143,14 @@ export class UsersController {
    * @param req a request beköldő token kiolvasott id
    * @returns kitöli az adatokat -> egyből ki jelenkezteti
    */
-  @Patch('update-admin:id')
+  @Patch('update-admin/:id')
   @UseGuards(AuthGuard('bearer'))
   updateUser(@Param('id') id: string, @Body() update: UpdateAdminDto, @Request() req) {
     const user: Users = req.user;
     if (user.role != 'manager' && user.role != 'admin') {
-      throw new ForbiddenException();
+      throw new ForbiddenException("You don't have premmision to update a nother user");
     }
-    return this.usersService.updateAdmin(+id, update);
+    return this.usersService.updateAdmin(update.id, update);
   }
 
   /**

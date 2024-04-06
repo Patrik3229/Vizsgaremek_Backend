@@ -28,8 +28,8 @@ export class RatingsService {
    * rating listázó
    * @returns összes receptet
    */
-  findAll() {
-    return this.db.ratings.findMany()
+  async findAll() {
+    return await this.db.$queryRaw`SELECT r.id,r.rating,r.content,r.recipe_id,r.posted, r.user_id,users.name as 'username' FROM ratings AS R INNER JOIN users ON r.user_id = users.id INNER JOIN recipes ON r.recipe_id = recipes.id`
   }
 
   /**

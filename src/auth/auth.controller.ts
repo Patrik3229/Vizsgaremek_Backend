@@ -30,7 +30,8 @@ export class AuthController {
     }
     /**ha minden helyes */
     return {
-      token: await this.authService.generateTokenFor(user)
+      token: await this.authService.generateTokenFor(user),
+      user_id: user.id 
     }
   }
 }

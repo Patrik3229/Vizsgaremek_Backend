@@ -23,7 +23,7 @@ export class CreateUserDto {
   @IsNotEmpty()
   passwordAgain: string
 
-  /**user rankja alapértelmezett sima 'user' */
-  @IsEmpty()
-  role: string
+  // /**user rankja alapértelmezett sima 'user' */
+  // @IsEmpty()
+  // role: string
 }
