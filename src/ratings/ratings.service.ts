@@ -66,7 +66,7 @@ export class RatingsService {
       data: {
         content: updateRatingDto.content,
         rating: updateRatingDto.rating,
-        posted: Date.now.toString()
+        posted: new Date().toISOString()
       }
     });
   }

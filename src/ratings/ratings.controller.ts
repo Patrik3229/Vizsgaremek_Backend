@@ -108,7 +108,7 @@ export class RatingsController {
    * @param id rating id
    * @returns kitörölt rating
    */
-  @Delete('deleteadmin:id')
+  @Delete('delete-admin/:id')
   @UseGuards(AuthGuard('bearer'))
   async removeAdmin(@Request() req, @Param('id') id: number) {
     const users: Users = req.user

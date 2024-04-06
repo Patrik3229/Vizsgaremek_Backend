@@ -133,7 +133,7 @@ export class RecipesController {
    * @param req a request beköldő token kiolvasott id
    * @returns kitörölt recept
    */
-  @Delete('delete-admin:id')
+  @Delete('delete-admin/:id')
   @UseGuards(AuthGuard('bearer'))
   removeManager(@Param('id') id: string, @Request() req) {
     const user: Users = req.user
