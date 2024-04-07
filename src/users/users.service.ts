@@ -319,6 +319,7 @@ export class UsersService {
    */
   remove(id: number) {
     /**id szerint törlünk */
+    console.log("**********User" + id)
     return this.db.users.delete({
       where: { id },
       select: {

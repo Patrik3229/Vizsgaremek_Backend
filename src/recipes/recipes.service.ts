@@ -49,7 +49,7 @@ export class RecipesService {
    * @returns kikeresi az összes receptet ami a felhasználóé
    */
   async findMine(id: number) {
-    return await this.db.$queryRaw`SELECT r.id,r.title,r.description,r.content,r.preptime,r.posted, r.user_id,users.name as 'username' FROM recipes AS R INNER JOIN users ON r.user_id = users.id WHERE r.user_id = ${id}`
+    return await this.db.$queryRaw`SELECT r.id,r.title,r.description,r.content,r.preptime,r.posted, r.user_id, users.name as 'username' FROM recipes AS R INNER JOIN users ON r.user_id = users.id WHERE r.user_id = ${id}`
   }
 
   /**
@@ -67,10 +67,9 @@ export class RecipesService {
    * @returns a kersett recept adatai
    */
   async findOne(id: number) {
-    return await this.db.recipes.findUnique({
-      where: { id }
-    })
-  }
+    return await this.db.$queryRaw`SELECT r.id,r.title,r.description,r.content,r.preptime,r.posted, r.user_id,users.name as 'username' FROM recipes AS R INNER JOIN users ON r.user_id = users.id WHERE r.user_id = ${id}`
+    }
+  
 
   /**
    * recept frissítő
@@ -114,8 +113,11 @@ export class RecipesService {
    * @returns kitörölt recept
    */
   remove(id: number) {
+    console.log("*********" + id)
     return this.db.recipes.delete({
-      where: { id }
+      where: {
+         id: id
+        }
     })
   }
 

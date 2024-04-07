@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, BadRequestException, UnauthorizedException, ForbiddenException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, BadRequestException, UnauthorizedException, ForbiddenException, ParseIntPipe } from '@nestjs/common';
 import { RatingsService } from './ratings.service';
 import { CreateRatingDto } from './dto/create-rating.dto';
 import { UpdateRatingDto } from './dto/update-rating.dto';
@@ -110,7 +110,7 @@ export class RatingsController {
    */
   @Delete('delete-admin/:id')
   @UseGuards(AuthGuard('bearer'))
-  async removeAdmin(@Request() req, @Param('id') id: number) {
+  async removeAdmin(@Request() req, @Param('id', ParseIntPipe) id: number) {
     const users: Users = req.user
     if (users.role != "manager" && users.role != "admin") {
       throw new UnauthorizedException("You dont have premmision for it")

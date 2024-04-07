@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, ForbiddenException, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, ForbiddenException, BadRequestException, ParseIntPipe } from '@nestjs/common';
 import { RecipesService } from './recipes.service';
 import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
@@ -59,8 +59,8 @@ export class RecipesController {
    * @returns receptet
    */
   @Get('find:id')
-  findOne(@Param('id') id: string) {
-    return this.recipesService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.recipesService.findOne(id);
   }
 
   /**
@@ -72,12 +72,12 @@ export class RecipesController {
    */
   @Get('search-user:id')
   @UseGuards(AuthGuard('bearer'))
-  NameSearch(@Param('id') id: string, @Request() req){
+  NameSearch(@Param('id', ParseIntPipe) id: number, @Request() req){
     const user : Users = req.user
     if (user.role != 'manager' && user.role != 'admin') {
       throw new ForbiddenException('You dont have premmision for it')
     }
-    return this.recipesService.findAllUser(+id);
+    return this.recipesService.findAllUser(id);
   }
 
   /**
@@ -88,8 +88,8 @@ export class RecipesController {
    */
   @Patch('update:id')
   @UseGuards(AuthGuard('bearer'))
-  update(@Param('id') id: string, @Body() updateRecipeDto: UpdateRecipeDto) {
-    return this.recipesService.update(+id, updateRecipeDto);
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateRecipeDto: UpdateRecipeDto) {
+    return this.recipesService.update(id, updateRecipeDto);
   }
 
   /**
@@ -102,12 +102,12 @@ export class RecipesController {
    */
   @Patch('update-admin:id')
   @UseGuards(AuthGuard('bearer'))
-  updateManager(@Param('id') id: string, @Body() updateRecipeDto: UpdateRecipeDto, @Request() req) {
+  updateManager(@Param('id', ParseIntPipe) id: number, @Body() updateRecipeDto: UpdateRecipeDto, @Request() req) {
     const user: Users = req.user
     if (user.role != 'manager' && user.role != 'admin') {
       throw new ForbiddenException('You dont have premmision for it')
     }
-    return this.recipesService.update(+id, updateRecipeDto);
+    return this.recipesService.update(id, updateRecipeDto);
   }
 
   /**
@@ -118,12 +118,12 @@ export class RecipesController {
    */
   @Delete('delete:id')
   @UseGuards(AuthGuard('bearer'))
-  remove(@Param('id') id: string, @Request() req) {
+  remove(@Param('id', ParseIntPipe) id: number, @Request() req) {
     const user : Users = req.user
-    if(user.id != parseInt(id)){
+    if(user.id != id){
       throw new ForbiddenException('You dont have premmision for it')
     }
-    return this.recipesService.remove(+id);
+    return this.recipesService.remove(id);
   }
 
   /**
@@ -135,11 +135,12 @@ export class RecipesController {
    */
   @Delete('delete-admin/:id')
   @UseGuards(AuthGuard('bearer'))
-  removeManager(@Param('id') id: string, @Request() req) {
+  removeManager(@Param('id', ParseIntPipe) id: number, @Request() req) {
     const user: Users = req.user
+    console.log("*********"+id+typeof(id))
     if (user.role != 'manager' && user.role != 'admin') {
       throw new ForbiddenException('You dont have premmision for it')
     }
-    return this.recipesService.remove(+id);
+    return this.recipesService.remove(id);
   }
 }
