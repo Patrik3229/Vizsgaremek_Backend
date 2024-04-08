@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, ForbiddenException, BadRequestException, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, ForbiddenException, ParseIntPipe } from '@nestjs/common';
 import { RecipesService } from './recipes.service';
 import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
@@ -27,7 +27,7 @@ export class RecipesController {
    * @param selectedAllergens allergenek id álló lista NEM KÖTELEZŐ
    * @returns egy listát a megfelelő receptekről
    */
-  @Get('searchContent')
+  @Post('searchContent')
   search(searchText: string, selectedAllergens: any[]) {
     return this.recipesService.searchConent(searchText, selectedAllergens)
   }
@@ -60,6 +60,7 @@ export class RecipesController {
    */
   @Get('find:id')
   findOne(@Param('id', ParseIntPipe) id: number) {
+    console.log("*******" + id + typeof(id))
     return this.recipesService.findOne(id);
   }
 
@@ -70,7 +71,7 @@ export class RecipesController {
    * @param req a request beköldő token kiolvasott id
    * @returns receptekből álló lista
    */
-  @Get('search-user:id')
+  @Get('search-user/:id')
   @UseGuards(AuthGuard('bearer'))
   NameSearch(@Param('id', ParseIntPipe) id: number, @Request() req){
     const user : Users = req.user

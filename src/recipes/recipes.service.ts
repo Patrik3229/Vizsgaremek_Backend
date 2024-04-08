@@ -67,8 +67,8 @@ export class RecipesService {
    * @returns a kersett recept adatai
    */
   async findOne(id: number) {
-    return await this.db.$queryRaw`SELECT r.id,r.title,r.description,r.content,r.preptime,r.posted, r.user_id,users.name as 'username' FROM recipes AS R INNER JOIN users ON r.user_id = users.id WHERE r.user_id = ${id}`
-    }
+    return await this.db.$queryRaw`SELECT r.id,r.title,r.description,r.content,r.preptime,r.posted, r.user_id, users.name as 'username' FROM recipes AS R INNER JOIN users ON r.user_id = users.id WHERE r.id = ${id}`
+  }
   
 
   /**
