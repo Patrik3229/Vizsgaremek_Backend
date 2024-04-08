@@ -134,7 +134,7 @@ export class RecipesService {
       throw new BadRequestException('Empty string')
     }
     const stringSql = `'%${string}%'`
-    /**megnézzük hogy a tömb csak szamokat tartalmazz */
+    /**megnézzük, hogy a tömb csak szamokat tartalmaz e */
     /**ha nincs allergen */
     if (array == null) {
       return this.db.$queryRaw`SELECT r.id, r.title, r.description, r.preptime, r.posted, AVG(ratings.rating) AS rating FROM recipes AS r INNER JOIN recipe_allergens ON r.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON r.id = ratings.recipe_id WHERE r.title LIKE ${stringSql} OR r.description LIKE ${stringSql};`
