@@ -129,24 +129,25 @@ export class RecipesService {
    */
   searchConent(string: string, array: any[]) {
     /**megnézzük hogy a szöveg nem üres */
+    console.log(`***************${JSON.stringify(array)}, ${typeof(array)}`)
     if (string == "") {
       throw new BadRequestException('Empty string')
     }
     const stringSql = `'%${string}%'`
     /**megnézzük hogy a tömb csak szamokat tartalmazz */
     /**ha nincs allergen */
-    if (array.length == 0) {
-      return this.db.$queryRaw`SELECT id, title, description, preptime, posted, AVG(ratings.rating) AS rating FROM recipes INNER JOIN recipe_allergens ON recipes.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON recipes.id = ratings.recipes_id WHERE title LIKE ${stringSql} OR recipes.description LIKE ${stringSql};`
+    if (array == null) {
+      return this.db.$queryRaw`SELECT r.id, r.title, r.description, r.preptime, r.posted, AVG(ratings.rating) AS rating FROM recipes AS r INNER JOIN recipe_allergens ON r.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON r.id = ratings.recipe_id WHERE r.title LIKE ${stringSql} OR r.description LIKE ${stringSql};`
     }
     const checkedArray: number[] = this.arrayChecker(array)
     /**ha van allergen = 1 */
     if (array.length == 1) {
-      return this.db.$queryRaw`SELECT id, title, description, preptime, posted, AVG(ratings.rating) AS rating FROM recipes INNER JOIN recipe_allergens ON recipes.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON recipes.id = ratings.recipes_id WHERE title LIKE ${stringSql} OR recipes.description LIKE ${stringSql} AND allergens.id NOT ${checkedArray[0]};`
+      return this.db.$queryRaw`SELECT id, title, description, preptime, posted, AVG(ratings.rating) AS rating FROM recipes INNER JOIN recipe_allergens ON recipes.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON recipes.id = ratings.recipe_id WHERE title LIKE ${stringSql} OR recipes.description LIKE ${stringSql} AND allergens.id NOT ${checkedArray[0]};`
     }
     /**mysql formatumhoz stringgé csináljuk az array */
     const arrayString: string = this.arrayToString(checkedArray)
     /**ha van allergen > 1 */
-    return this.db.$queryRaw`SELECT id, title, description, preptime, posted, AVG(ratings.rating) AS rating FROM recipes INNER JOIN recipe_allergens ON recipes.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON recipes.id = ratings.recipes_id WHERE title LIKE ${stringSql} OR recipes.description LIKE ${stringSql} AND allergens.id NOT IN ${arrayString};`
+    return this.db.$queryRaw`SELECT id, title, description, preptime, posted, AVG(ratings.rating) AS rating FROM recipes INNER JOIN recipe_allergens ON recipes.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON recipes.id = ratings.recipe_id WHERE title LIKE ${stringSql} OR recipes.description LIKE ${stringSql} AND allergens.id NOT IN ${arrayString};`
   }
 
   /**
