@@ -52,7 +52,7 @@ async function otherSeed() {
     for (let i = 0; i < 10; i++) {
         const x = await prisma.recipes.create({
             data: {
-                title: faker.lorem.words({ min: 1, max: 100 }),
+                title: faker.lorem.words({ min: 1, max: 5 }),
                 description: faker.lorem.words({ min: 1, max: 300 }),
                 content: faker.lorem.text(),
                 preptime: faker.number.int({ min: 1, max: 150 }),
