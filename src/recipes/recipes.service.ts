@@ -70,7 +70,7 @@ export class RecipesService {
    * @returns egy recepteket tartalamzó listát
    */
   async findUser(id: number) {
-    return this.db.recipes.findMany({
+    return await this.db.recipes.findMany({
       where : {
         user_id : id
       },

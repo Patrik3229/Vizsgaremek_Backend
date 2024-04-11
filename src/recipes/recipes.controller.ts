@@ -67,7 +67,7 @@ export class RecipesController {
 
   @Get('find-user/:id')
   findUser(@Param('id', ParseIntPipe) id: number){
-    return this.findUser(id)
+    return this.recipesService.findUser(id)
   }
 
   /**
