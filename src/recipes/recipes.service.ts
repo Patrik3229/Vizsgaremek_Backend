@@ -4,6 +4,8 @@ import { UpdateRecipeDto } from './dto/update-recipe.dto';
 import { PrismaService } from 'src/prisma.service';
 import { AllergensService } from 'src/allergens/allergens.service';
 import { RecipesAllergensService } from 'src/recipes_allergens/recipes_allergens.service';
+import { Search } from './dto/search-class';
+import { tr } from '@faker-js/faker';
 
 @Injectable()
 export class RecipesService {
@@ -58,7 +60,30 @@ export class RecipesService {
    * @returns egy recepteket tartalamzó listát
    */
   async findAllUser(id: number) {
-    return await this.db.$queryRaw`SELECT r.id,r.title,r.description,r.content,r.preptime,r.posted, r.user_id,users.name as 'username' FROM recipes AS R INNER JOIN users ON r.user_id = users.id WHERE r.user_id = ${id}`
+    const a = await this.db.$queryRaw`SELECT r.id,r.title,r.description,r.content,r.preptime,r.posted, r.user_id,users.name as 'username' FROM recipes AS R INNER JOIN users ON r.user_id = users.id WHERE r.user_id = ${id}`
+    return a
+  }
+
+  /**
+   * 1 user összes receptjét adja vissza
+   * @param id user id-ja
+   * @returns egy recepteket tartalamzó listát
+   */
+  async findUser(id: number) {
+    return this.db.recipes.findMany({
+      where : {
+        user_id : id
+      },
+      select : {
+        title : true,
+        description : true,
+        id : true,
+        preptime : true,
+        content : false,
+        posted : true,
+        user_id:false        
+      }
+    })
   }
 
   /**
@@ -67,7 +92,8 @@ export class RecipesService {
    * @returns a kersett recept adatai
    */
   async findOne(id: number) {
-    return await this.db.$queryRaw`SELECT r.id,r.title,r.description,r.content,r.preptime,r.posted, r.user_id, users.name as 'username' FROM recipes AS R INNER JOIN users ON r.user_id = users.id WHERE r.id = ${id}`
+    const a = await this.db.$queryRaw`SELECT r.id,r.title,r.description,r.content,r.preptime,r.posted, r.user_id, users.name as 'username' FROM recipes AS R INNER JOIN users ON r.user_id = users.id WHERE r.id = ${id}`
+    return a[0]
   }
   
 
@@ -127,27 +153,31 @@ export class RecipesService {
    * @param array allergene az id tömbje (lehet 1 is)
    * @returns a keresésnek megfelelő receptek
    */
-  searchConent(string: string, array: any[]) {
+  searchConent(array: Search) {
     /**megnézzük hogy a szöveg nem üres */
-    console.log(`***************${JSON.stringify(array)}, ${typeof(array)}`)
-    if (string == "") {
+    const data = array
+    console.log(`***************${JSON.stringify(data.searchText)}, ${typeof(data.searchText)}`)
+    if (data.searchText == "") {
       throw new BadRequestException('Empty string')
     }
-    const stringSql = `'%${string}%'`
+    const stringSql = `'%${data.searchText}%'`
     /**megnézzük, hogy a tömb csak szamokat tartalmaz e */
     /**ha nincs allergen */
-    if (array == null) {
-      return this.db.$queryRaw`SELECT r.id, r.title, r.description, r.preptime, r.posted, AVG(ratings.rating) AS rating FROM recipes AS r INNER JOIN recipe_allergens ON r.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON r.id = ratings.recipe_id WHERE r.title LIKE ${stringSql} OR r.description LIKE ${stringSql};`
+    if (data.selectedAllergens == null) {
+      const respones = this.db.$queryRaw`SELECT r.id, r.title, r.description, r.preptime, r.posted, AVG(ratings.rating) AS rating FROM recipes AS r INNER JOIN recipe_allergens ON r.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON r.id = ratings.recipe_id WHERE r.title LIKE ${stringSql} OR r.description LIKE ${stringSql};`
+      return respones
     }
-    const checkedArray: number[] = this.arrayChecker(array)
+    const checkedArray: number[] = this.arrayChecker(data.selectedAllergens)
     /**ha van allergen = 1 */
-    if (array.length == 1) {
-      return this.db.$queryRaw`SELECT id, title, description, preptime, posted, AVG(ratings.rating) AS rating FROM recipes INNER JOIN recipe_allergens ON recipes.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON recipes.id = ratings.recipe_id WHERE title LIKE ${stringSql} OR recipes.description LIKE ${stringSql} AND allergens.id NOT ${checkedArray[0]};`
+    if (data.selectedAllergens.length == 1) {
+      const respones = this.db.$queryRaw`SELECT r.id, r.title, r.description, r.preptime, r.posted, AVG(ratings.rating) AS rating FROM recipes AS r INNER JOIN recipe_allergens ON r.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON r.id = ratings.recipe_id WHERE r.title LIKE ${stringSql} OR r.description LIKE ${stringSql} AND allergens.id NOT ${checkedArray[0]};`
+      return respones
     }
     /**mysql formatumhoz stringgé csináljuk az array */
     const arrayString: string = this.arrayToString(checkedArray)
     /**ha van allergen > 1 */
-    return this.db.$queryRaw`SELECT id, title, description, preptime, posted, AVG(ratings.rating) AS rating FROM recipes INNER JOIN recipe_allergens ON recipes.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON recipes.id = ratings.recipe_id WHERE title LIKE ${stringSql} OR recipes.description LIKE ${stringSql} AND allergens.id NOT IN ${arrayString};`
+    const respones = this.db.$queryRaw`SELECT r.id, r.title, r.description, r.preptime, r.posted, AVG(ratings.rating) AS rating FROM recipes AS r INNER JOIN recipe_allergens ON r.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON r.id = ratings.recipe_id WHERE r.title LIKE ${stringSql} OR r.description LIKE ${stringSql} AND allergens.id NOT IN ${arrayString};`
+    return respones
   }
 
   /**

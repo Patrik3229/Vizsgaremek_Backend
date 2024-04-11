@@ -4,6 +4,8 @@ import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { Users } from '@prisma/client';
+import { Search } from './dto/search-class';
+import { th } from '@faker-js/faker';
 
 @Controller('recipes')
 export class RecipesController {
@@ -28,8 +30,8 @@ export class RecipesController {
    * @returns egy listát a megfelelő receptekről
    */
   @Post('searchContent')
-  search(searchText: string, selectedAllergens: any[]) {
-    return this.recipesService.searchConent(searchText, selectedAllergens)
+  search(@Body() selectedAllergens: Search) {
+    return this.recipesService.searchConent(selectedAllergens)
   }
 
   /**
@@ -60,8 +62,12 @@ export class RecipesController {
    */
   @Get('find:id')
   findOne(@Param('id', ParseIntPipe) id: number) {
-    console.log("*******" + id + typeof(id))
     return this.recipesService.findOne(id);
+  }
+
+  @Get('find-user/:id')
+  findUser(@Param('id', ParseIntPipe) id: number){
+    return this.findUser(id)
   }
 
   /**
