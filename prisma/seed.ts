@@ -55,7 +55,7 @@ async function otherSeed() {
                 title: faker.lorem.words({ min: 1, max: 5 }),
                 description: faker.lorem.words({ min: 1, max: 300 }),
                 content: faker.lorem.text(),
-                preptime: faker.number.int({ min: 1, max: 150 }),
+                preptime: faker.number.int({ min: 2, max: 150 }),
                 user_id: 1 //this for the default admin
             }
         })
