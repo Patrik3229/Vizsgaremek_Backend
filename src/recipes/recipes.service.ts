@@ -70,20 +70,7 @@ export class RecipesService {
    * @returns egy recepteket tartalamzó listát
    */
   async findUser(id: number) {
-    return await this.db.recipes.findMany({
-      where : {
-        user_id : id
-      },
-      select : {
-        title : true,
-        description : true,
-        id : true,
-        preptime : true,
-        content : false,
-        posted : true,
-        user_id:false        
-      }
-    })
+    return await this.db.$queryRaw`SELECT r.id,r.title,r.description, r.preptime, r.posted allegens.name FROM recipes AS r INNER JOIN recipe_allergens ON r.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id WHERE r.user_id = ${id}`
   }
 
   /**
