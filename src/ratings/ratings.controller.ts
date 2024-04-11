@@ -57,7 +57,16 @@ export class RatingsController {
   @UseGuards(AuthGuard('bearer'))
   meRating(@Request() req) {
     const user: Users = req.user
-    return this.ratingsService.findAllByUser(user.id)
+    return this.ratingsService.findAllByUser(user.id);
+  }
+
+  /**
+   * Visszaadja az öt legmagasabb értékeléssel rendelkező receptet
+   * @returns 
+   */
+  @Get('top-5')
+  topFive(){
+    return this.ratingsService.topFiveRating();
   }
 
   /**
