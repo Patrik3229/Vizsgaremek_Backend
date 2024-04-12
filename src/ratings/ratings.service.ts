@@ -95,7 +95,7 @@ export class RatingsService {
    * top 5 recept megkerése
    * @returns a top 5 értékelt recept
    */
-  topFiveRating() {
-    return this.db.$queryRaw`SELECT AVG(rating) AS rating, title FROM ratings INNER JOIN recipes ON rating.recipes_id = recipes.id GROUP BY recipes_id ORDER BY rating LIMIT 5`
+  async topFiveRating() {
+    return await this.db.$queryRaw`SELECT AVG(rating) AS rating, title FROM ratings INNER JOIN recipes ON rating.recipes_id = recipes.id GROUP BY recipes_id ORDER BY rating LIMIT 5`
   }
 }
