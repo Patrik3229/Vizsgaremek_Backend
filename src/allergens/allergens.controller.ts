@@ -29,7 +29,7 @@ export class AllergensController {
    * @param id receőt id-ja
    * @returns allergen nevéből álló listát
    */
-  @Get('find-recipe:id')
+  @Get('find-recipe/:id')
   findrecipe(@Param('id') id:string){
     return this.allergensService.findRecipeAllergen(+id);
   }
