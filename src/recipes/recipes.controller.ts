@@ -1,11 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, ForbiddenException, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, ForbiddenException, ParseIntPipe, Optional } from '@nestjs/common';
 import { RecipesService } from './recipes.service';
 import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { Users } from '@prisma/client';
 import { Search } from './dto/search-class';
-import { th } from '@faker-js/faker';
 
 @Controller('recipes')
 export class RecipesController {
@@ -30,8 +29,8 @@ export class RecipesController {
    * @returns egy listát a megfelelő receptekről
    */
   @Post('searchContent')
-  search(@Body() selectedAllergens: Search) {
-    return this.recipesService.searchConent(selectedAllergens)
+  search(@Body() array : Search) {
+    return this.recipesService.searchContent(array)
   }
 
   /**

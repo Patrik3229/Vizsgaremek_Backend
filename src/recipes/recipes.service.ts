@@ -5,7 +5,7 @@ import { PrismaService } from 'src/prisma.service';
 import { AllergensService } from 'src/allergens/allergens.service';
 import { RecipesAllergensService } from 'src/recipes_allergens/recipes_allergens.service';
 import { Search } from './dto/search-class';
-import { tr } from '@faker-js/faker';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class RecipesService {
@@ -140,31 +140,41 @@ export class RecipesService {
    * @param array allergene az id tömbje (lehet 1 is)
    * @returns a keresésnek megfelelő receptek
    */
-  searchConent(array: Search) {
-    /**megnézzük hogy a szöveg nem üres */
-    const data = array
-    console.log(`***************${JSON.stringify(data.searchText)}, ${typeof(data.searchText)}`)
-    if (data.searchText == "") {
-      throw new BadRequestException('Empty string')
+  async searchContent(data: Search) {
+    if (data.searchText === "") {
+      throw new BadRequestException('Empty string');
     }
-    const stringSql = `'%${data.searchText}%'`
-    /**megnézzük, hogy a tömb csak szamokat tartalmaz e */
-    /**ha nincs allergen */
-    if (data.selectedAllergens == null) {
-      const respones = this.db.$queryRaw`SELECT r.id, r.title, r.description, r.preptime, r.posted, AVG(ratings.rating) AS rating FROM recipes AS r INNER JOIN recipe_allergens ON r.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON r.id = ratings.recipe_id WHERE r.title LIKE ${stringSql} OR r.description LIKE ${stringSql};`
-      return respones
+    if(this.checker(data.searchText) ==  false){
+      throw new BadRequestException('Wrong string');
     }
-    const checkedArray: number[] = this.arrayChecker(data.selectedAllergens)
-    /**ha van allergen = 1 */
-    if (data.selectedAllergens.length == 1) {
-      const respones = this.db.$queryRaw`SELECT r.id, r.title, r.description, r.preptime, r.posted, AVG(ratings.rating) AS rating FROM recipes AS r INNER JOIN recipe_allergens ON r.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON r.id = ratings.recipe_id WHERE r.title LIKE ${stringSql} OR r.description LIKE ${stringSql} AND allergens.id NOT ${checkedArray[0]};`
-      return respones
+    const searchText = `%${data.searchText}%`;
+    const selectedAllergens = data.selectedAllergens;
+    let allergenCondition = '';
+    // Only create the allergen condition if there are allergens to exclude
+    if (selectedAllergens && selectedAllergens.length > 0) {
+      const allergensNotIn = selectedAllergens.map(id => `${id}`).join(', ');  // Map and join the allergens array
+      allergenCondition = `AND NOT EXISTS (
+            SELECT 1 FROM recipe_allergens ra
+            WHERE ra.recipe_id = r.id
+            AND ra.allergen_id IN (${allergensNotIn})
+        )`;
     }
-    /**mysql formatumhoz stringgé csináljuk az array */
-    const arrayString: string = this.arrayToString(checkedArray)
-    /**ha van allergen > 1 */
-    const respones = this.db.$queryRaw`SELECT r.id, r.title, r.description, r.preptime, r.posted, AVG(ratings.rating) AS rating FROM recipes AS r INNER JOIN recipe_allergens ON r.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON r.id = ratings.recipe_id WHERE r.title LIKE ${stringSql} OR r.description LIKE ${stringSql} AND allergens.id NOT IN ${arrayString};`
-    return respones
+    try {
+      const response = await this.db.$queryRaw`
+      SELECT r.id, r.title, r.description, r.preptime, r.posted, AVG(ratings.rating) AS rating
+      FROM recipes AS r
+      INNER JOIN ratings ON r.id = ratings.recipe_id
+      WHERE (r.title LIKE ${searchText})
+      ${Prisma.raw(allergenCondition)}
+      GROUP BY r.id, r.title, r.description, r.preptime, r.posted;
+      `;
+
+      console.log("Query successful: ", response);
+      return response;
+    } catch (error) {
+      console.error("Query failed: ", error);
+      throw new BadRequestException('Query execution failed');
+    }
   }
 
   /**
@@ -180,6 +190,30 @@ export class RecipesService {
     }
     return array
   }
+
+  checker(string : string) {
+    const s = string.toUpperCase().trim()
+    if(s.includes("SELECT")){
+      return false
+    }
+    if(s.includes("INSERT")){
+      return false
+    }
+    if(s.includes("UPDATE")){
+      return false
+    }
+    if(s.includes("DROP")){
+      return false
+    }
+    if(s.includes("DELETE")){
+      return false
+    }
+    if(s.includes("CREATE")){
+      return false
+    }
+    return true
+  }
+
 
   /**
    * mysql not in kellően string converter
