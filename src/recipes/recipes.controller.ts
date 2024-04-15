@@ -31,7 +31,7 @@ export class RecipesController {
    */
   @Post('searchContent')
   search(@Body() selectedAllergens: Search) {
-    return this.recipesService.searchConent(selectedAllergens)
+    return this.recipesService.searchContent(selectedAllergens)
   }
 
   /**

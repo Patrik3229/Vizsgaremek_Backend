@@ -6,18 +6,19 @@ import { AllergensService } from 'src/allergens/allergens.service';
 import { RecipesAllergensService } from 'src/recipes_allergens/recipes_allergens.service';
 import { Search } from './dto/search-class';
 import { tr } from '@faker-js/faker';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class RecipesService {
-  constructor(private readonly db: PrismaService, private readonly allergen: AllergensService, private readonly connectTable : RecipesAllergensService) { }
+  constructor(private readonly db: PrismaService, private readonly allergen: AllergensService, private readonly connectTable: RecipesAllergensService) { }
 
   /**
    * új recept poszt csinál
    * @param createRecipeDto a user altal bekuldott adatok, a body talalhato adatok
    * @returns új receptet ad vissza
    */
-  async create(id : number, createRecipeDto: CreateRecipeDto) {
-    const chechedAllergens : number[] = this.arrayChecker(createRecipeDto.allergens)
+  async create(id: number, createRecipeDto: CreateRecipeDto) {
+    const chechedAllergens: number[] = this.arrayChecker(createRecipeDto.allergens)
     const recipe = await this.db.recipes.create({
       data: {
         title: createRecipeDto.title,
@@ -29,8 +30,8 @@ export class RecipesService {
     })
     /**a kapcsolo tablahoz felvesszuk */
     await this.db.recipe_Allergens.createMany({
-      data : chechedAllergens.map(a => ({
-        allergen_id : a,
+      data: chechedAllergens.map(a => ({
+        allergen_id: a,
         recipe_id: recipe.id
       }))
     })
@@ -82,7 +83,7 @@ export class RecipesService {
     const a = await this.db.$queryRaw`SELECT r.id,r.title,r.description,r.content,r.preptime,r.posted, r.user_id, users.name as 'username' FROM recipes AS R INNER JOIN users ON r.user_id = users.id WHERE r.id = ${id}`
     return a[0]
   }
-  
+
 
   /**
    * recept frissítő
@@ -90,7 +91,7 @@ export class RecipesService {
    * @param updateRecipeDto a modosítandó adatok 
    * @returns updated receptel
    */
-   async update(id: number, updateRecipeDto: UpdateRecipeDto) {
+  async update(id: number, updateRecipeDto: UpdateRecipeDto) {
     /**a kapcsoló tábla frisítése, add + delete */
     if (updateRecipeDto.allergens != null && updateRecipeDto.allergens.length != 0) {
       const results = await this.db.recipe_Allergens.findMany({
@@ -101,7 +102,7 @@ export class RecipesService {
           allergen_id: true
         }
       })
-      const currectAllergens = results.map(x => x.allergen_id)  
+      const currectAllergens = results.map(x => x.allergen_id)
       const remoreAllergens = updateRecipeDto.allergens.filter(x => currectAllergens.indexOf(x) < 0)
       this.RemovedAllergens(updateRecipeDto.id, remoreAllergens)
       const createAllergens = currectAllergens.filter(x => updateRecipeDto.allergens.indexOf(x) < 0)
@@ -129,8 +130,8 @@ export class RecipesService {
     console.log("*********" + id)
     return this.db.recipes.delete({
       where: {
-         id: id
-        }
+        id: id
+      }
     })
   }
 
@@ -140,31 +141,41 @@ export class RecipesService {
    * @param array allergene az id tömbje (lehet 1 is)
    * @returns a keresésnek megfelelő receptek
    */
-  searchConent(array: Search) {
-    /**megnézzük hogy a szöveg nem üres */
-    const data = array
-    console.log(`***************${JSON.stringify(data.searchText)}, ${typeof(data.searchText)}`)
-    if (data.searchText == "") {
-      throw new BadRequestException('Empty string')
+  async searchContent(data: Search) {
+    if (data.searchText === "") {
+      throw new BadRequestException('Empty string');
     }
-    const stringSql = `'%${data.searchText}%'`
-    /**megnézzük, hogy a tömb csak szamokat tartalmaz e */
-    /**ha nincs allergen */
-    if (data.selectedAllergens == null) {
-      const respones = this.db.$queryRaw`SELECT r.id, r.title, r.description, r.preptime, r.posted, AVG(ratings.rating) AS rating FROM recipes AS r INNER JOIN recipe_allergens ON r.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON r.id = ratings.recipe_id WHERE r.title LIKE ${stringSql} OR r.description LIKE ${stringSql};`
-      return respones
+
+    const searchText = `%${data.searchText}%`;
+    const selectedAllergens = data.selectedAllergens;
+    let allergenCondition = '';
+
+    // Only create the allergen condition if there are allergens to exclude
+    if (selectedAllergens && selectedAllergens.length > 0) {
+      const allergensNotIn = selectedAllergens.map(id => `${id}`).join(', ');  // Map and join the allergens array
+      allergenCondition = `AND NOT EXISTS (
+            SELECT 1 FROM recipe_allergens ra
+            WHERE ra.recipe_id = r.id
+            AND ra.allergen_id IN (${allergensNotIn})
+        )`;
     }
-    const checkedArray: number[] = this.arrayChecker(data.selectedAllergens)
-    /**ha van allergen = 1 */
-    if (data.selectedAllergens.length == 1) {
-      const respones = this.db.$queryRaw`SELECT r.id, r.title, r.description, r.preptime, r.posted, AVG(ratings.rating) AS rating FROM recipes AS r INNER JOIN recipe_allergens ON r.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON r.id = ratings.recipe_id WHERE r.title LIKE ${stringSql} OR r.description LIKE ${stringSql} AND allergens.id NOT ${checkedArray[0]};`
-      return respones
+
+    try {
+      const response = await this.db.$queryRaw`
+      SELECT r.id, r.title, r.description, r.preptime, r.posted, AVG(ratings.rating) AS rating
+      FROM recipes AS r
+      INNER JOIN ratings ON r.id = ratings.recipe_id
+      WHERE (r.title LIKE ${searchText})
+      ${Prisma.raw(allergenCondition)}
+      GROUP BY r.id, r.title, r.description, r.preptime, r.posted;
+      `;
+
+      console.log("Query successful: ", response);
+      return response;
+    } catch (error) {
+      console.error("Query failed: ", error);
+      throw new BadRequestException('Query execution failed');
     }
-    /**mysql formatumhoz stringgé csináljuk az array */
-    const arrayString: string = this.arrayToString(checkedArray)
-    /**ha van allergen > 1 */
-    const respones = this.db.$queryRaw`SELECT r.id, r.title, r.description, r.preptime, r.posted, AVG(ratings.rating) AS rating FROM recipes AS r INNER JOIN recipe_allergens ON r.id = recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id INNER JOIN ratings ON r.id = ratings.recipe_id WHERE r.title LIKE ${stringSql} OR r.description LIKE ${stringSql} AND allergens.id NOT IN ${arrayString};`
-    return respones
   }
 
   /**
