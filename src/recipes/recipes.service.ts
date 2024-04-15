@@ -92,7 +92,6 @@ export class RecipesService {
    * @returns updated receptel
    */
   async update(id: number, updateRecipeDto: UpdateRecipeDto) {
-    /**a kapcsoló tábla frisítése, add + delete */
     if (updateRecipeDto.allergens != null && updateRecipeDto.allergens.length != 0) {
       const results = await this.db.recipe_Allergens.findMany({
         where: {
@@ -101,25 +100,32 @@ export class RecipesService {
         select: {
           allergen_id: true
         }
-      })
-      const currectAllergens = results.map(x => x.allergen_id)
-      const remoreAllergens = updateRecipeDto.allergens.filter(x => currectAllergens.indexOf(x) < 0)
-      this.RemovedAllergens(updateRecipeDto.id, remoreAllergens)
-      const createAllergens = currectAllergens.filter(x => updateRecipeDto.allergens.indexOf(x) < 0)
-      this.CreateAllergens(updateRecipeDto.id, createAllergens)
+      });
+
+      const currentAllergens = results.map(x => x.allergen_id);
+      const allergensToRemove = currentAllergens.filter(x => !updateRecipeDto.allergens.includes(x));
+      const allergensToAdd = updateRecipeDto.allergens.filter(x => !currentAllergens.includes(x));
+
+      if (allergensToRemove.length > 0) {
+        await this.RemovedAllergens(id, allergensToRemove); // Assuming this method deletes allergens
+      }
+      if (allergensToAdd.length > 0) {
+        await this.CreateAllergens(id, allergensToAdd); // Assuming this method adds allergens
+      }
     }
+
     return await this.db.recipes.update({
       where: { id },
       data: {
         title: updateRecipeDto.title,
         description: updateRecipeDto.description,
         content: updateRecipeDto.content,
-        /**Az időt mindig amikor lefut az update kicseréljük */
         posted: new Date().toISOString(),
         preptime: updateRecipeDto.preptime
       }
-    })
+    });
   }
+
 
   /**
    * receptet töröl ki
@@ -214,8 +220,13 @@ export class RecipesService {
    * @param id recept id-ja
    * @param removedAllergens kitörölendő id-k
    */
-  RemovedAllergens(id: number, removedAllergens: number[]) {
-    this.connectTable.delete(id, removedAllergens)
+  async RemovedAllergens(recipeId: number, allergensToRemove: number[]) {
+    await this.db.recipe_Allergens.deleteMany({
+      where: {
+        recipe_id: recipeId,
+        allergen_id: { in: allergensToRemove }
+      }
+    });
   }
 
   /**
@@ -223,9 +234,14 @@ export class RecipesService {
    * @param id recept id-ja
    * @param createAllergens hozzáadandó id-k
    */
-  CreateAllergens(id: number, createAllergens: number[]) {
-    createAllergens.forEach(element => {
-      this.connectTable.create(id, element)
+  async CreateAllergens(recipeId: number, allergensToAdd: number[]) {
+    const allergenData = allergensToAdd.map(allergenId => ({
+      recipe_id: recipeId,
+      allergen_id: allergenId
+    }));
+
+    await this.db.recipe_Allergens.createMany({
+      data: allergenData
     });
   }
 }
