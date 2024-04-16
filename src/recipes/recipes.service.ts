@@ -168,7 +168,7 @@ export class RecipesService {
 
     try {
       const response = await this.db.$queryRaw`
-      SELECT r.id, r.title, r.description, r.preptime, r.posted, AVG(ratings.rating) AS rating
+      SELECT r.id, r.title, r.description, r.preptime, r.posted, CAST(AVG(ratings.rating) AS FLOAT) AS rating
       FROM recipes AS r
       INNER JOIN ratings ON r.id = ratings.recipe_id
       WHERE (r.title LIKE ${searchText})
