@@ -127,8 +127,11 @@ export class RecipesController {
   @UseGuards(AuthGuard('bearer'))
   async remove(@Param('id', ParseIntPipe) id: number, @Request() req) {
     const user : Users = req.user
-    const sentUsert = await this.usersService.findOne(id)
-    if(user.id != sentUsert.id){
+    const sentUsert = await this.recipesService.findOne(id)
+    console.log(`paraméter: ${id}`);
+    console.log(`user id: ${user.id}`);
+    console.log(`sentUser id: ${sentUsert.user_id}`);
+    if(user.id != sentUsert.user_id){
       throw new ForbiddenException('You dont have premmision for it')
     }
     return this.recipesService.remove(id);
