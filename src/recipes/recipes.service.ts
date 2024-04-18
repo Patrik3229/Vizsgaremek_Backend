@@ -5,7 +5,6 @@ import { PrismaService } from 'src/prisma.service';
 import { AllergensService } from 'src/allergens/allergens.service';
 import { RecipesAllergensService } from 'src/recipes_allergens/recipes_allergens.service';
 import { Search } from './dto/search-class';
-import { tr } from '@faker-js/faker';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
@@ -197,6 +196,30 @@ export class RecipesService {
     }
     return array
   }
+
+  checker(string : string) {
+    const s = string.toUpperCase().trim()
+    if(s.includes("SELECT")){
+      return false
+    }
+    if(s.includes("INSERT")){
+      return false
+    }
+    if(s.includes("UPDATE")){
+      return false
+    }
+    if(s.includes("DROP")){
+      return false
+    }
+    if(s.includes("DELETE")){
+      return false
+    }
+    if(s.includes("CREATE")){
+      return false
+    }
+    return true
+  }
+
 
   /**
    * mysql not in kellően string converter

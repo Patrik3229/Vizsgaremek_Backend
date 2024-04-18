@@ -1,15 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, ForbiddenException, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, ForbiddenException, ParseIntPipe, Optional } from '@nestjs/common';
 import { RecipesService } from './recipes.service';
 import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { Users } from '@prisma/client';
 import { Search } from './dto/search-class';
-import { th } from '@faker-js/faker';
+import { UsersService } from 'src/users/users.service';
 
 @Controller('recipes')
 export class RecipesController {
-  constructor(private readonly recipesService: RecipesService) { }
+  constructor(private readonly recipesService: RecipesService, private readonly usersService : UsersService) { }
 
   /**
    * új receptet fügvény
@@ -125,9 +125,10 @@ export class RecipesController {
    */
   @Delete('delete:id')
   @UseGuards(AuthGuard('bearer'))
-  remove(@Param('id', ParseIntPipe) id: number, @Request() req) {
+  async remove(@Param('id', ParseIntPipe) id: number, @Request() req) {
     const user : Users = req.user
-    if(user.id != id){
+    const sentUsert = await this.usersService.findOne(id)
+    if(user.id != sentUsert.id){
       throw new ForbiddenException('You dont have premmision for it')
     }
     return this.recipesService.remove(id);

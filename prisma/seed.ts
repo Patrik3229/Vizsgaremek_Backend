@@ -4,6 +4,8 @@ import * as argon2 from "argon2";
 import { faker } from '@faker-js/faker';
 import { Allergen } from "./allergens";
 import {promises as fs} from 'fs'
+import { Recipes } from "./recipes";
+import { error } from "console";
 /**
  * jelszót titkosít
  * @param pass 
@@ -27,8 +29,15 @@ async function seedAdmin() {
             role: "manager"
         }
     })
+    const user = await prisma.users.create({
+        data: {
+            email: "user.test@example.com",
+            name: "Test User",
+            password: await hash("Password123"),
+        }
+    })
     await otherSeed() /**modosított rating */
-    //AllergensFinalSeed() /**modosított rating */
+    //await FinalSeed() /**modosított data */
 }
 
 async function otherSeed() {
@@ -79,9 +88,9 @@ async function otherSeed() {
 }
 
 /**
- * allergen seed a final-hoz
+ * final seed with realistic recipes
  */
-async function AllergensFinalSeed() {
+async function FinalSeed() {
     try {
         const response = await fs.readFile("./prisma/allergens.json", "utf8")
         const x = JSON.parse(response) as Allergen[]
@@ -93,6 +102,42 @@ async function AllergensFinalSeed() {
             })
         }
     } catch (e) {
+        console.log(e)
+    }
+    try {
+        const response = await fs.readFile("./prisma/recipies_translated.json", "utf8")
+        const data = JSON.parse(response) as Recipes[]
+        data.forEach(async recipe => {
+            const r = await prisma.recipes.create({
+                data: {
+                    title: recipe.title,
+                    description: recipe.description,
+                    content: recipe.content,
+                    preptime: recipe.preptime,
+                    user_id: faker.number.int({min: 1, max: 2}) // this for 2 deffault user
+                }
+            })
+            for (let i = 0; i < recipe.allergens.length; i++) {
+                if(recipe.allergens[i] == 1){
+                    const y = await prisma.recipe_Allergens.create({
+                        data: {
+                            allergen_id: i+1,
+                            recipe_id: r.id
+                        }
+                    })
+                }
+            }
+            //rating still with faker
+            const y = await prisma.ratings.create({
+                data: {
+                    content: faker.lorem.text(),
+                    user_id: faker.number.int({min : 1, max : 2}),  //this for the default 2 user
+                    recipe_id: r.id,
+                    rating: faker.number.int({ min: 1, max: 5 })
+                }
+            })
+        })
+    }catch (e) {
         console.log(e)
     }
 }

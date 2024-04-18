@@ -1,3 +1,11 @@
+import { Optional } from "@nestjs/common"
+import { IsNotEmpty, IsString } from "class-validator"
+
 export class Search{
-    constructor(public searchText: string, public selectedAllergens: string[]){}
+    @IsNotEmpty()
+    @IsString()
+    searchText: string
+
+    @Optional()
+    selectedAllergens: number[]
 }

@@ -48,6 +48,11 @@ export class RatingsController {
     return this.ratingsService.findOne(+id);
   }
 
+  @Get('find-recipe:id')
+  findRecipe(@Param('id', ParseIntPipe) id: number){
+    return this.ratingsService.findRecipe(id)
+  }
+
   /**
    * vissza adja a bejelnekezett user ratingjeit
    * @param req a request beköldő token kiolvasott id
