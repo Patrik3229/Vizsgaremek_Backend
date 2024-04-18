@@ -48,8 +48,8 @@ export class RatingsController {
     return this.ratingsService.findOne(+id);
   }
 
-  @Get('find:recipe')
-  findRecipe(@Param('recipe', ParseIntPipe) id: number){
+  @Get('find-recipe:id')
+  findRecipe(@Param('id', ParseIntPipe) id: number){
     return this.ratingsService.findRecipe(id)
   }
 
