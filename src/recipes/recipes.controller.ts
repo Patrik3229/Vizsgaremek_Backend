@@ -30,8 +30,8 @@ export class RecipesController {
    * @returns egy listát a megfelelő receptekről
    */
   @Post('searchContent')
-  search(@Body() array : Search) {
-    return this.recipesService.searchContent(array)
+  search(@Body() selectedAllergens: Search) {
+    return this.recipesService.searchContent(selectedAllergens)
   }
 
   /**

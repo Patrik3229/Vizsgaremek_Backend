@@ -9,15 +9,15 @@ import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class RecipesService {
-  constructor(private readonly db: PrismaService, private readonly allergen: AllergensService, private readonly connectTable : RecipesAllergensService) { }
+  constructor(private readonly db: PrismaService, private readonly allergen: AllergensService, private readonly connectTable: RecipesAllergensService) { }
 
   /**
    * új recept poszt csinál
    * @param createRecipeDto a user altal bekuldott adatok, a body talalhato adatok
    * @returns új receptet ad vissza
    */
-  async create(id : number, createRecipeDto: CreateRecipeDto) {
-    const chechedAllergens : number[] = this.arrayChecker(createRecipeDto.allergens)
+  async create(id: number, createRecipeDto: CreateRecipeDto) {
+    const chechedAllergens: number[] = this.arrayChecker(createRecipeDto.allergens)
     const recipe = await this.db.recipes.create({
       data: {
         title: createRecipeDto.title,
@@ -29,8 +29,8 @@ export class RecipesService {
     })
     /**a kapcsolo tablahoz felvesszuk */
     await this.db.recipe_Allergens.createMany({
-      data : chechedAllergens.map(a => ({
-        allergen_id : a,
+      data: chechedAllergens.map(a => ({
+        allergen_id: a,
         recipe_id: recipe.id
       }))
     })
@@ -82,7 +82,7 @@ export class RecipesService {
     const a = await this.db.$queryRaw`SELECT r.id,r.title,r.description,r.content,r.preptime,r.posted, r.user_id, users.name as 'username' FROM recipes AS R INNER JOIN users ON r.user_id = users.id WHERE r.id = ${id}`
     return a[0]
   }
-  
+
 
   /**
    * recept frissítő
@@ -90,8 +90,7 @@ export class RecipesService {
    * @param updateRecipeDto a modosítandó adatok 
    * @returns updated receptel
    */
-   async update(id: number, updateRecipeDto: UpdateRecipeDto) {
-    /**a kapcsoló tábla frisítése, add + delete */
+  async update(id: number, updateRecipeDto: UpdateRecipeDto) {
     if (updateRecipeDto.allergens != null && updateRecipeDto.allergens.length != 0) {
       const results = await this.db.recipe_Allergens.findMany({
         where: {
@@ -100,25 +99,32 @@ export class RecipesService {
         select: {
           allergen_id: true
         }
-      })
-      const currectAllergens = results.map(x => x.allergen_id)  
-      const remoreAllergens = updateRecipeDto.allergens.filter(x => currectAllergens.indexOf(x) < 0)
-      this.RemovedAllergens(updateRecipeDto.id, remoreAllergens)
-      const createAllergens = currectAllergens.filter(x => updateRecipeDto.allergens.indexOf(x) < 0)
-      this.CreateAllergens(updateRecipeDto.id, createAllergens)
+      });
+
+      const currentAllergens = results.map(x => x.allergen_id);
+      const allergensToRemove = currentAllergens.filter(x => !updateRecipeDto.allergens.includes(x));
+      const allergensToAdd = updateRecipeDto.allergens.filter(x => !currentAllergens.includes(x));
+
+      if (allergensToRemove.length > 0) {
+        await this.RemovedAllergens(id, allergensToRemove); // Assuming this method deletes allergens
+      }
+      if (allergensToAdd.length > 0) {
+        await this.CreateAllergens(id, allergensToAdd); // Assuming this method adds allergens
+      }
     }
+
     return await this.db.recipes.update({
       where: { id },
       data: {
         title: updateRecipeDto.title,
         description: updateRecipeDto.description,
         content: updateRecipeDto.content,
-        /**Az időt mindig amikor lefut az update kicseréljük */
         posted: new Date().toISOString(),
         preptime: updateRecipeDto.preptime
       }
-    })
+    });
   }
+
 
   /**
    * receptet töröl ki
@@ -129,8 +135,8 @@ export class RecipesService {
     console.log("*********" + id)
     return this.db.recipes.delete({
       where: {
-         id: id
-        }
+        id: id
+      }
     })
   }
 
@@ -144,12 +150,11 @@ export class RecipesService {
     if (data.searchText === "") {
       throw new BadRequestException('Empty string');
     }
-    if(this.checker(data.searchText) ==  false){
-      throw new BadRequestException('Wrong string');
-    }
+
     const searchText = `%${data.searchText}%`;
     const selectedAllergens = data.selectedAllergens;
     let allergenCondition = '';
+
     // Only create the allergen condition if there are allergens to exclude
     if (selectedAllergens && selectedAllergens.length > 0) {
       const allergensNotIn = selectedAllergens.map(id => `${id}`).join(', ');  // Map and join the allergens array
@@ -159,9 +164,10 @@ export class RecipesService {
             AND ra.allergen_id IN (${allergensNotIn})
         )`;
     }
+
     try {
       const response = await this.db.$queryRaw`
-      SELECT r.id, r.title, r.description, r.preptime, r.posted, AVG(ratings.rating) AS rating
+      SELECT r.id, r.title, r.description, r.preptime, r.posted, CAST(AVG(ratings.rating) AS FLOAT) AS rating
       FROM recipes AS r
       INNER JOIN ratings ON r.id = ratings.recipe_id
       WHERE (r.title LIKE ${searchText})
@@ -237,8 +243,13 @@ export class RecipesService {
    * @param id recept id-ja
    * @param removedAllergens kitörölendő id-k
    */
-  RemovedAllergens(id: number, removedAllergens: number[]) {
-    this.connectTable.delete(id, removedAllergens)
+  async RemovedAllergens(recipeId: number, allergensToRemove: number[]) {
+    await this.db.recipe_Allergens.deleteMany({
+      where: {
+        recipe_id: recipeId,
+        allergen_id: { in: allergensToRemove }
+      }
+    });
   }
 
   /**
@@ -246,9 +257,14 @@ export class RecipesService {
    * @param id recept id-ja
    * @param createAllergens hozzáadandó id-k
    */
-  CreateAllergens(id: number, createAllergens: number[]) {
-    createAllergens.forEach(element => {
-      this.connectTable.create(id, element)
+  async CreateAllergens(recipeId: number, allergensToAdd: number[]) {
+    const allergenData = allergensToAdd.map(allergenId => ({
+      recipe_id: recipeId,
+      allergen_id: allergenId
+    }));
+
+    await this.db.recipe_Allergens.createMany({
+      data: allergenData
     });
   }
 }
