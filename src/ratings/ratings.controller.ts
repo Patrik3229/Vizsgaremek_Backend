@@ -53,7 +53,7 @@ export class RatingsController {
    * @param id recept id-ja
    * @returns ratingekből álló listát
    */
-  @Get('find-recipe:id')
+  @Get('find-recipe/:id')
   findRecipe(@Param('id', ParseIntPipe) id: number){
     return this.ratingsService.findRecipe(id)
   }
