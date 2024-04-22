@@ -12,8 +12,8 @@
       <p><b>API</b> + <a href="https://github.com/EFanni05/Vizsgaremek_Asztali">Asztali</a></p>
     </li>
 </ul><br>
-<p>Extras: <a href="https://github.com/EFanni05/Vizsgaremek_extras">database dumpj-ja és Vitest</a></p>
-<p>'npm run start:dev' vagy 'npm run start:debug'</p><br>
+<p>Extras: <a href="https://github.com/EFanni05/Vizsgaremek_extras">database dumpj-ja és Vitest</a></p><br>
+<p>'npm run start:dev' vagy 'npm run start:debug'</p>
 <hr>
 <h5>Fecske Márk feladati voltak még:</h5>
 <i><ul>
