@@ -96,7 +96,7 @@ export class RatingsService {
    * @returns avg rating értékelését, nem kerekített
    */
   avgRating(id: number) {
-    return Prisma.raw(`SELECT AVG(rating) AS avg-rating FROM ratings WHERE user_id = ${id}`)
+    return this.db.$queryRaw`SELECT CAST(AVG(rating) AS FLOAT) AS rating FROM ratings WHERE recipe_id = ${id}`;
   }
 
   /**
@@ -104,6 +104,6 @@ export class RatingsService {
    * @returns a top 5 értékelt recept
    */
   async topFiveRating() {
-    return await this.db.$queryRaw`SELECT AVG(rating) AS rating, title, recipes.id FROM ratings INNER JOIN recipes ON ratings.recipe_id = recipes.id GROUP BY recipe_id ORDER BY rating DESC LIMIT 5`
+    return await this.db.$queryRaw`SELECT CAST(AVG(rating) AS FLOAT) AS rating, title, recipes.id FROM ratings INNER JOIN recipes ON ratings.recipe_id = recipes.id GROUP BY recipe_id ORDER BY rating DESC LIMIT 5`
   }
 }

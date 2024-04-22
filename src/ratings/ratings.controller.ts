@@ -79,6 +79,11 @@ export class RatingsController {
     return this.ratingsService.topFiveRating();
   }
 
+  @Get('avg-recipe/:id')
+  avgRecipe(@Param('id', ParseIntPipe) id : number){
+    return this.ratingsService.avgRating(id)
+  }
+
   /**
    * user saját ratingjét frissitő function
    * @param req a request beköldő token kiolvasott id
