@@ -79,6 +79,11 @@ export class RatingsController {
     return this.ratingsService.topFiveRating();
   }
 
+  /**
+   * egy recept atlag rating adja vissza 
+   * @param id recept id
+   * @returns avg float kent
+   */
   @Get('avg-recipe/:id')
   avgRecipe(@Param('id', ParseIntPipe) id : number){
     return this.ratingsService.avgRating(id)
