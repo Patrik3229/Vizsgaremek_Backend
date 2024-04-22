@@ -12,13 +12,14 @@
       <p><b>API</b> + <a href="https://github.com/EFanni05/Vizsgaremek_Asztali">Asztali</a></p>
     </li>
 </ul><br>
-<p>Extras: <a href="https://github.com/EFanni05/Vizsgaremek_extras">database dumpj-ja és Vitest</a></p><br>
-<p>'npm run start:dev' vagy 'npm run start:debug'</p>
+<p>Extras: <a href="https://github.com/EFanni05/Vizsgaremek_extras">database dumpj-ja és Vitest</a></p>
 <hr>
 <h5>Fecske Márk feladati voltak még:</h5>
 <i><ul>
   <li>Logo készítése</li>
   <li>Mobil applikáció</li>
 </ul></i>
+<hr>
+<a href="https://github.com/Patrik3229/Vizsgaremek_Backend/wiki">Az API setup kapcsolatos információk</a>
 <hr>
 <img src="https://i.giphy.com/jmSaWt3akL4Qa5d4J6.webp" height="250">
