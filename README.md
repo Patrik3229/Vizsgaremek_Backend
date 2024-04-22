@@ -13,7 +13,6 @@
     </li>
 </ul><br>
 <p>Extras: <a href="https://github.com/EFanni05/Vizsgaremek_extras">database dumpj-ja és Vitest</a></p><br>
-<p>'npm run start:dev' vagy 'npm run start:debug'</p>
 <hr>
 <h5>Fecske Márk feladati voltak még:</h5>
 <i><ul>
