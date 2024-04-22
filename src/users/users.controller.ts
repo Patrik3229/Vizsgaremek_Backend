@@ -138,7 +138,7 @@ export class UsersController {
 
   /**
    * ADMIN FUNCTION
-   * egy user adatait tudja kitörölni rankot
+   * Admin ranggal egy másik felhasználó adatait frissítí
    * @param id user id
    * @param req a request beköldő token kiolvasott id
    * @returns kitöli az adatokat -> egyből ki jelenkezteti
@@ -147,7 +147,7 @@ export class UsersController {
   @UseGuards(AuthGuard('bearer'))
   updateUser(@Param('id') id: string, @Body() update: UpdateAdminDto, @Request() req) {
     const user: Users = req.user;
-    if (user.role != 'manager' && user.role != 'admin') {
+    if (user.role != 'manager') {
       throw new ForbiddenException("You don't have premmision to update a nother user");
     }
     return this.usersService.updateAdmin(update.id, update);
