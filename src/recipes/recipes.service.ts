@@ -70,7 +70,7 @@ export class RecipesService {
    * @returns egy recepteket tartalamzó listát
    */
   async findUser(id: number) {
-    return await this.db.$queryRaw`SELECT r.id, r.title, r.description, r.preptime, r.posted, GROUP_CONCAT(allergens.name ORDER BY allergens.name SEPARATOR ', ') AS allergen_names, GROUP_CONCAT(allergens.id ORDER BY allergens.id SEPARATOR ',') AS allergen_ids FROM recipes AS r INNER JOIN recipe_allergens ON r.id = recipe_allergens.recipe_id INNER JOIN allergens ON recipe_allergens.allergen_id = allergens.id WHERE r.user_id = ${id} GROUP BY r.id, r.title, r.description, r.preptime, r.posted;`
+    return await this.db.$queryRaw`SELECT r.id, r.title, r.description, r.preptime, r.posted, GROUP_CONCAT(allergens.name ORDER BY allergens.name SEPARATOR ', ') AS allergen_names, GROUP_CONCAT(allergens.id ORDER BY allergens.id SEPARATOR ',') AS allergen_ids FROM recipes AS r LEFT JOIN recipe_allergens ON r.id = recipe_allergens.recipe_id LEFT JOIN allergens ON recipe_allergens.allergen_id = allergens.id WHERE r.user_id = ${id} GROUP BY r.id, r.title, r.description, r.preptime, r.posted;`
   }
 
   /**
