@@ -169,7 +169,7 @@ export class RecipesService {
       const response = await this.db.$queryRaw`
       SELECT r.id, r.title, r.description, r.preptime, r.posted, CAST(AVG(ratings.rating) AS FLOAT) AS rating
       FROM recipes AS r
-      INNER JOIN ratings ON r.id = ratings.recipe_id
+      LEFT JOIN ratings ON r.id = ratings.recipe_id
       WHERE (r.title LIKE ${searchText})
       ${Prisma.raw(allergenCondition)}
       GROUP BY r.id, r.title, r.description, r.preptime, r.posted;
