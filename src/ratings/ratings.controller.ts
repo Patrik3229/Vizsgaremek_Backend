@@ -24,7 +24,7 @@ export class RatingsController {
 
   /**
    * ADMIN FUNCTION
-   * egy receptehz az összes rating kilistázza
+   * Az összes rating kilistázza
    * @param id id-ja
    * @returns rating tömböt
    */
@@ -48,7 +48,12 @@ export class RatingsController {
     return this.ratingsService.findOne(+id);
   }
 
-  @Get('find-recipe:id')
+  /**
+   * Egy recepthez tartozó ratingek listázása
+   * @param id recept id-ja
+   * @returns ratingekből álló listát
+   */
+  @Get('find-recipe/:id')
   findRecipe(@Param('id', ParseIntPipe) id: number){
     return this.ratingsService.findRecipe(id)
   }
@@ -82,7 +87,12 @@ export class RatingsController {
    */
   @Patch('update')
   @UseGuards(AuthGuard('bearer'))
-  update(@Body() updateRatingDto: UpdateRatingDto) {
+  async update(@Request() req, @Body() updateRatingDto: UpdateRatingDto) {
+    const users: Users = req.user
+    const sentUsert = await this.ratingsService.findOne(updateRatingDto.id)
+    if (users.id != sentUsert.user_id) {
+      throw new ForbiddenException('You dont have premmision for it');
+    }
     return this.ratingsService.update(updateRatingDto.id ,updateRatingDto);
   }
 
