@@ -21,5 +21,3 @@
 </ul></i>
 <hr>
 <a href="https://github.com/Patrik3229/Vizsgaremek_Backend/wiki">Az API setup kapcsolatos információk</a>
-<hr>
-<img src="https://i.giphy.com/jmSaWt3akL4Qa5d4J6.webp" height="250">
